@@ -1,6 +1,6 @@
 # CNR Marks Sheet Generator
 
-A browser-based marks sheet creator with a floral notebook-style preview. It runs as a static site; Bun provides local development, builds, and browser checks.
+A browser-based marks sheet creator with a floral notebook-style preview. It runs as a static site; Bun provides local development, builds, browser checks, and GitHub Pages deployment.
 
 ## Requirements
 
@@ -11,13 +11,11 @@ A browser-based marks sheet creator with a floral notebook-style preview. It run
 ## Project structure
 
 ```text
-src/                    App source served by the development server
+public/                 Static HTML and sheet artwork
   index.html
-  app.js
-  assets.js
-  styles.css
-  fonts.css
-  assets/svg/            Sheet artwork
+  assets/svg/
+src/css/                App styles and Patrick Hand font setup
+src/js/                 App logic and asset registry
 scripts/                Bun development, build, and browser-check scripts
 dist/                   Generated static site (ignored by Git)
 .github/workflows/       GitHub Pages deployment
@@ -38,7 +36,7 @@ Open <http://127.0.0.1:5173>. Stop the server with `Ctrl+C`.
 bun run check:responsive
 ```
 
-The check opens Chrome at desktop, tablet, and phone sizes, checks the loaded sheet fonts and layout, then saves screenshots to `responsive-check-output/`. It exits with a non-zero status if a check fails. To install Chrome if needed:
+The check builds the deployable site, opens Chrome at desktop, tablet, and phone sizes, checks Patrick Hand and content fit, then saves screenshots to `output/`. It exits with a non-zero status if a check fails. To install Chrome if needed:
 
 ```sh
 bunx playwright install chrome
@@ -51,7 +49,7 @@ bun run build
 bun run preview
 ```
 
-The build copies the static app into `dist/`. The preview server runs at <http://127.0.0.1:5173> and serves that generated folder.
+The build copies the static app into `dist/`. The preview server runs at <http://127.0.0.1:5173> and serves that generated folder. Run `PORT=5174 bun run preview` if port 5173 is occupied.
 
 ## Deploy to GitHub Pages
 
@@ -76,4 +74,4 @@ git push origin main
 - Absent students are excluded from the grand total and average.
 - Average is `grand total ÷ (present students × maximum marks) × 100`.
 
-CSV import is built in. Excel `.xlsx` and `.xls` import uses SheetJS from a CDN. PNG export uses html2canvas from a CDN. Fonts load from Google Fonts; offline system fallbacks are used when the network is unavailable. All student data stays in the browser's local storage.
+CSV import is built in. Excel `.xlsx` and `.xls` import uses SheetJS from a CDN. PNG export uses html2canvas from a CDN. Patrick Hand and the UI font load from Google Fonts; system cursive fallbacks are used offline. No local `vendor/` folder is needed. All student data stays in the browser's local storage.

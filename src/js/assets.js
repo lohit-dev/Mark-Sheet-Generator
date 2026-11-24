@@ -9,7 +9,7 @@
  *
  * Layout
  * ──────
- * assets/svg/
+ * public/assets/svg/
  *   flower-tl.svg        top-left corner cluster
  *   flower-tr.svg        top-right corner cluster
  *   flower-bl.svg        bottom-left corner cluster

@@ -496,7 +496,7 @@ textarea:focus {
     transparent 33px
   );
   color: var(--sheet-blue);
-  font-family: "Kalam", "SheetHand", "Patrick Hand SC", cursive;
+  font-family: "Patrick Hand", cursive;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -539,19 +539,19 @@ textarea:focus {
 .sheet .art.tl {
   left: 8px;
   top: 6px;
-  width: 236px;
+  width: 32.6%;
 }
 .sheet .art.tr {
   right: 8px;
   top: 6px;
-  width: 236px;
+  width: 32.6%;
 }
 
 .sheet .ribbon {
   position: absolute;
   left: 50%;
   top: 2px;
-  width: 450px;
+  width: 62.15%;
   transform: translateX(-50%);
 }
 .sheet .ribbon img {
@@ -568,7 +568,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-family: "Kalam", "SheetHand", "Patrick Hand SC", cursive;
+  font-family: "Patrick Hand", cursive;
   font-weight: 700;
   font-size: 38px;
   color: var(--sheet-blue);
@@ -640,7 +640,7 @@ textarea:focus {
 .sheet .art.fbl,
 .sheet .art.fbr {
   position: relative;
-  width: 190px;
+  width: 26.25%;
   flex: none;
 }
 .sheet .page.left .foot {
@@ -652,6 +652,7 @@ textarea:focus {
 }
 .sheet .page.right .foot .center {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -674,7 +675,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-family: "Dancing Script", "SheetScript", cursive;
+  font-family: "Patrick Hand", cursive;
   font-weight: 700;
   color: var(--sheet-blue);
   line-height: 1;
@@ -686,23 +687,24 @@ textarea:focus {
   margin-left: 12px;
 }
 .sheet .label.avg {
-  width: 410px;
+  width: 56.6%;
 }
 .sheet .label.avg span {
   font-size: 44px;
 }
 .sheet .label.tot {
-  width: 330px;
+  width: 45.6%;
 }
 .sheet .label.tot span {
   font-size: 44px;
 }
 .sheet .teacher {
-  font-family: "Dancing Script", "SheetScript", cursive;
+  font-family: "Patrick Hand", cursive;
   font-weight: 700;
   font-size: 25px;
   color: var(--sheet-blue);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
 }
 
 /* ═══════════════════════════════════════════════════════════════

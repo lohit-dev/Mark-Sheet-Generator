@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "dev": "bun scripts/serve.mjs src",
+    "dev": "bun scripts/serve.mjs dev",
     "build": "bun scripts/build.mjs",
     "preview": "bun scripts/serve.mjs dist",
     "check:responsive": "bun scripts/check-responsive.mjs"

@@ -219,22 +219,114 @@
     el.innerHTML = h + "</tbody>";
   }
 
+  const HAND_FONT = '"Patrick Hand", cursive';
+  const SCRIPT_FONT = HAND_FONT;
+  const measureCanvas = document.createElement("canvas").getContext("2d");
+
+  function measureText(text, size, family, weight = 700) {
+    measureCanvas.font = weight + " " + size + "px " + family;
+    return measureCanvas.measureText(text).width;
+  }
+
+  function fitText(element, text, size, maxWidth, family, minSize = 14) {
+    const width = measureText(text, size, family);
+    const fitted = width > maxWidth
+      ? Math.max(minSize, Math.floor((size * maxWidth) / width))
+      : size;
+    element.style.fontSize = fitted + "px";
+  }
+
+  function balancedLines(text, size, family) {
+    const words = text.trim().split(/\s+/);
+    if (words.length < 2) return [text];
+    let best = [text];
+    let bestScore = Infinity;
+    for (let split = 1; split < words.length; split++) {
+      const first = words.slice(0, split).join(" ");
+      const second = words.slice(split).join(" ");
+      const a = measureText(first, size, family);
+      const b = measureText(second, size, family);
+      const score = Math.max(a, b) + Math.abs(a - b) * 0.04;
+      if (score < bestScore) {
+        best = [first, second];
+        bestScore = score;
+      }
+    }
+    return best;
+  }
+
   function fitTitle(text) {
     const span = $("sheetTitle");
-    span.textContent = text;
-    let size = 38;
-    try {
-      const ctx =
-        fitTitle.ctx ||
-        (fitTitle.ctx = document.createElement("canvas").getContext("2d"));
-      ctx.font = '700 38px "Kalam", "SheetHand", "Patrick Hand SC", cursive';
-      const w = ctx.measureText(text).width + text.length * 0.5;
-      const avail = span.parentElement.offsetWidth * 0.78 - 6;
-      if (w > avail) size = Math.max(18, Math.floor((38 * avail) / w));
-    } catch (e) {
-      /* keep default size */
-    }
-    span.style.fontSize = size + "px";
+    const ribbon = span.parentElement;
+    const pageWidth = ribbon.parentElement.clientWidth;
+    const maxRibbonWidth = pageWidth * 0.84;
+    const oneLineAt32 = measureText(text, 32, HAND_FONT);
+    const maxTextWidth = maxRibbonWidth * 0.78 - 6;
+    const lines = oneLineAt32 <= maxTextWidth ? [text] : balancedLines(text, 32, HAND_FONT);
+    const lineWidth = Math.max(...lines.map((line) => measureText(line, lines.length > 1 ? 32 : 38, HAND_FONT)));
+    const baseSize = lines.length > 1 ? 32 : 38;
+    const ribbonWidth = Math.max(
+      pageWidth * 0.62,
+      Math.min(maxRibbonWidth, lineWidth / 0.78 + 6),
+    );
+    span.textContent = lines.join("\n");
+    span.style.whiteSpace = lines.length > 1 ? "pre-line" : "nowrap";
+    span.style.lineHeight = lines.length > 1 ? "0.9" : "1";
+    ribbon.style.width = ribbonWidth + "px";
+    const textWidth = ribbonWidth * 0.78 - 6;
+    span.style.fontSize =
+      Math.max(18, Math.min(baseSize, Math.floor((baseSize * textWidth) / lineWidth))) +
+      "px";
+  }
+
+  function fitLabel(selector) {
+    const label = document.querySelector(selector);
+    const span = label.querySelector("span");
+    const pageWidth = label.closest(".page").clientWidth;
+    const maxWidth = Math.min(label.parentElement.clientWidth, pageWidth * 0.62);
+    const minWidth = Math.min(maxWidth, pageWidth * 0.3);
+    const text = span.textContent.replace(/\s+/g, " ").trim();
+    const measured = measureText(text, 44, SCRIPT_FONT);
+    const width = Math.max(minWidth, Math.min(maxWidth, measured / 0.8 + 18));
+    label.style.width = width + "px";
+    span.style.fontSize = Math.max(20, Math.min(44, (width - 18) * 0.8 * 44 / measured)) + "px";
+  }
+
+  function fitSheetText() {
+    const subtitle = $("sheetSubtitle");
+    fitText(
+      subtitle,
+      subtitle.textContent,
+      32,
+      subtitle.parentElement.clientWidth * 0.9,
+      HAND_FONT,
+      18,
+    );
+    fitLabel(".label.avg");
+    fitLabel(".label.tot");
+
+    const teacher = $("teacherLine");
+    const teacherText = teacher.textContent;
+    const teacherWidth = teacher.parentElement.clientWidth * 0.94;
+    const teacherLines =
+      measureText(teacherText, 25, SCRIPT_FONT) > teacherWidth
+        ? balancedLines(teacherText, 25, SCRIPT_FONT)
+        : [teacherText];
+    teacher.textContent = teacherLines.join("\n");
+    teacher.style.whiteSpace = teacherLines.length > 1 ? "pre-line" : "nowrap";
+    const longestTeacherLine = teacherLines.reduce((longest, line) =>
+      measureText(line, 25, SCRIPT_FONT) > measureText(longest, 25, SCRIPT_FONT)
+        ? line
+        : longest,
+    );
+    fitText(
+      teacher,
+      longestTeacherLine,
+      25,
+      teacherWidth,
+      SCRIPT_FONT,
+      16,
+    );
   }
 
   function render() {
@@ -245,8 +337,9 @@
         .join(" - ")
         .toUpperCase(),
     );
+    const branchSuffix = /\bbranch$/i.test(d.branch) ? "" : " Branch";
     $("sheetSubtitle").textContent =
-      "Class " + d.className + (d.branch ? " | " + d.branch + " Branch" : "");
+      "Class " + d.className + (d.branch ? " | " + d.branch + branchSuffix : "");
     $("teacherLine").textContent = d.teacher ? "Teacher: " + d.teacher : "";
 
     const mid = Math.ceil(students.length / 2);
@@ -260,6 +353,7 @@
       : 0;
     $("grandTotal").textContent = fmt(grand);
     $("averageValue").textContent = avg.toFixed(2) + "%";
+    fitSheetText();
 
     const absent = students.filter((s) => status(s) === "absent").length;
     const label =

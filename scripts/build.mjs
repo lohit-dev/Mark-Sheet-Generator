@@ -1,17 +1,22 @@
-import { cp, mkdir, rm } from "node:fs/promises";
-import { resolve } from "node:path";
+import { copyFile, mkdir, rm } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 
 const projectRoot = resolve(import.meta.dir, "..");
-const source = resolve(projectRoot, "src");
 const output = resolve(projectRoot, "dist");
+const sources = [
+  resolve(projectRoot, "public"),
+  resolve(projectRoot, "src"),
+];
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
-for (const entry of new Bun.Glob("**/*").scanSync({ cwd: source, onlyFiles: false })) {
-  const from = resolve(source, entry);
-  const to = resolve(output, entry);
-  if (entry.includes("/")) await mkdir(resolve(to, ".."), { recursive: true });
-  await cp(from, to, { recursive: true, force: true });
+
+for (const source of sources) {
+  for (const entry of new Bun.Glob("**/*").scanSync({ cwd: source, onlyFiles: true })) {
+    const destination = resolve(output, entry);
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(resolve(source, entry), destination);
+  }
 }
 
 console.log(`Static site built in ${output}`);

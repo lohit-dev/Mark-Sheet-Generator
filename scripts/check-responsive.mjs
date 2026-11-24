@@ -9,8 +9,8 @@ import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const projectRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const siteRoot = resolve(projectRoot, "src");
-const output = resolve(projectRoot, "responsive-check-output");
+const siteRoot = resolve(projectRoot, "dist");
+const output = resolve(projectRoot, "output");
 let chromium;
 try {
   ({ chromium } = await import("playwright"));
@@ -19,6 +19,7 @@ try {
   process.exit(1);
 }
 
+await import("./build.mjs");
 await mkdir(output, { recursive: true });
 
 let browser;
@@ -44,6 +45,8 @@ try {
   await page.locator("#csvPaste").fill(sampleRows.join("\n"));
   await page.locator("#importPaste").click();
   await page.waitForFunction(() => window.__cnr.students.length === 31);
+  await page.locator("#branch").fill("North Valley Regional Campus Branch");
+  await page.locator("#teacher").fill("D.V.N.S. Rama Rao, Senior Mathematics Teacher");
   await page.evaluate(async () => {
     await Promise.race([
       document.fonts.ready,
@@ -62,8 +65,7 @@ try {
     const result = await page.evaluate(async () => {
       await Promise.race([
         Promise.all([
-          document.fonts.load('700 38px "Kalam"'),
-          document.fonts.load('700 44px "Dancing Script"'),
+          document.fonts.load('400 38px "Patrick Hand"'),
         ]),
         new Promise((resolve) => setTimeout(resolve, 12000)),
       ]);
@@ -82,8 +84,24 @@ try {
         tableFont: getComputedStyle(document.querySelector("#tblA td")).fontFamily,
         titleWeight: getComputedStyle(document.querySelector("#sheetTitle")).fontWeight,
         tableWeight: getComputedStyle(document.querySelector("#tblA th")).fontWeight,
-        kalamLoaded: document.fonts.check('700 38px "Kalam"'),
-        dancingScriptLoaded: document.fonts.check('700 44px "Dancing Script"'),
+        fittedTextSizes: {
+          title: document.querySelector("#sheetTitle").style.fontSize,
+          subtitle: document.querySelector("#sheetSubtitle").style.fontSize,
+          average: document.querySelector(".label.avg span").style.fontSize,
+          total: document.querySelector(".label.tot span").style.fontSize,
+          teacher: document.querySelector("#teacherLine").style.fontSize,
+        },
+        textOverflow: [
+          "#sheetTitle",
+          "#sheetSubtitle",
+          ".label.avg span",
+          ".label.tot span",
+          "#teacherLine",
+        ].some((selector) => {
+          const element = document.querySelector(selector);
+          return element.scrollWidth > element.clientWidth + 1;
+        }),
+        patrickHandLoaded: document.fonts.check('400 38px "Patrick Hand"'),
         overflowElements: [...document.querySelectorAll("body *")]
           .map((element) => ({
             name: element.id || element.className || element.tagName,
@@ -101,12 +119,12 @@ try {
       : columnCount === 2;
     const widthOkay = result.documentWidth <= viewport.width;
     const fontOkay =
-      result.kalamLoaded &&
-      result.dancingScriptLoaded &&
+      result.patrickHandLoaded &&
       result.titleWeight === "700" &&
       result.tableWeight === "700" &&
-      result.titleFont.includes("Kalam") &&
-      result.tableFont.includes("Kalam");
+      result.titleFont.includes("Patrick Hand") &&
+      result.tableFont.includes("Patrick Hand") &&
+      !result.textOverflow;
     if (!layoutOkay || !widthOkay || !fontOkay) failed = true;
 
     const screenshot = `preview-${viewport.name}.png`;
