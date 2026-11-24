@@ -1,0 +1,15 @@
+{
+  "name": "cnr-marks-sheet-generator",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "bun@1.4.4",
+  "scripts": {
+    "dev": "bun scripts/serve.mjs src",
+    "build": "bun scripts/build.mjs",
+    "preview": "bun scripts/serve.mjs dist",
+    "check:responsive": "bun scripts/check-responsive.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

@@ -1,53 +1,25 @@
 #!/usr/bin/env node
 
 // Browser check for the responsive preview and the sheet fonts.
-// Run from the project folder after installing Playwright:
-//   npm install --no-save playwright
-//   node check-responsive.mjs
+// Run from the project folder after `bun install`:
+//   bun run check:responsive
 
-import { createServer } from "node:http";
-import { readFile, mkdir } from "node:fs/promises";
-import { extname, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdir } from "node:fs/promises";
+import { resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const root = resolve(fileURLToPath(new URL(".", import.meta.url)));
-const output = resolve(root, "responsive-check-output");
-const mime = {
-  ".css": "text/css; charset=utf-8",
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml",
-};
-
+const projectRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const siteRoot = resolve(projectRoot, "src");
+const output = resolve(projectRoot, "responsive-check-output");
 let chromium;
 try {
   ({ chromium } = await import("playwright"));
 } catch {
-  console.error("Playwright is not installed. Run: npm install --no-save playwright");
+  console.error("Playwright is not installed. Run: bun install");
   process.exit(1);
 }
 
-const server = createServer(async (request, response) => {
-  try {
-    const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
-    const file = resolve(root, `.${pathname}`);
-    if (file !== root && !file.startsWith(root + sep)) {
-      response.writeHead(403).end("Forbidden");
-      return;
-    }
-    const contents = await readFile(file || resolve(root, "index.html"));
-    response.writeHead(200, {
-      "content-type": mime[extname(file)] || "application/octet-stream",
-    });
-    response.end(contents);
-  } catch {
-    response.writeHead(404).end("Not found");
-  }
-});
-
 await mkdir(output, { recursive: true });
-await new Promise((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
 
 let browser;
 let failed = false;
@@ -58,7 +30,7 @@ try {
     failed = true;
     console.error(`Page error: ${error.message}`);
   });
-  await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, {
+  await page.goto(pathToFileURL(resolve(siteRoot, "index.html")).href, {
     waitUntil: "domcontentloaded",
   });
   await page.waitForSelector("#marksSheet");
@@ -112,6 +84,15 @@ try {
         tableWeight: getComputedStyle(document.querySelector("#tblA th")).fontWeight,
         kalamLoaded: document.fonts.check('700 38px "Kalam"'),
         dancingScriptLoaded: document.fonts.check('700 44px "Dancing Script"'),
+        overflowElements: [...document.querySelectorAll("body *")]
+          .map((element) => ({
+            name: element.id || element.className || element.tagName,
+            right: Math.round(element.getBoundingClientRect().right),
+            width: Math.round(element.getBoundingClientRect().width),
+            insideScrollArea: Boolean(element.closest(".entry-wrap")),
+          }))
+          .filter((element) => element.right > innerWidth + 1 && !element.insideScrollArea)
+          .slice(0, 8),
       };
     });
     const columnCount = result.gridColumns.trim().split(/\s+/).length;
@@ -162,7 +143,6 @@ try {
   console.error(error);
 } finally {
   if (browser) await browser.close();
-  await new Promise((resolveClose) => server.close(resolveClose));
 }
 
 console.log(`Screenshots are in ${output}`);
