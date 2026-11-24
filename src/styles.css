@@ -519,7 +519,7 @@ textarea:focus {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-top: 142px;
+  padding-top: 156px;
   min-width: 0;
 }
 .sheet .page.left {
@@ -549,9 +549,10 @@ textarea:focus {
 
 .sheet .ribbon {
   position: absolute;
-  left: 158px;
+  left: 50%;
   top: 2px;
-  width: 540px;
+  width: 450px;
+  transform: translateX(-50%);
 }
 .sheet .ribbon img {
   width: 100%;
@@ -576,9 +577,9 @@ textarea:focus {
 }
 .sheet .subtitle {
   position: absolute;
-  left: 250px;
-  right: 30px;
-  top: 98px;
+  left: 0;
+  right: 0;
+  top: 116px;
   text-align: center;
   font-size: 32px;
   font-weight: 700;
