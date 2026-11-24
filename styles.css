@@ -486,7 +486,14 @@ textarea:focus {
   width: 1448px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: #f5f3fd;
+  background-color: #f5f3fd;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    rgba(81, 113, 195, 0.1) 32px,
+    transparent 33px
+  );
   color: var(--sheet-blue);
   font-family: "Kalam", "SheetHand", "Patrick Hand SC", cursive;
   -webkit-print-color-adjust: exact;
@@ -559,7 +566,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-family: "Playfair Display", "SheetSerif", Georgia, serif;
+  font-family: "Kalam", "SheetHand", "Patrick Hand SC", cursive;
   font-weight: 700;
   font-size: 38px;
   color: var(--sheet-blue);
@@ -573,6 +580,7 @@ textarea:focus {
   top: 98px;
   text-align: center;
   font-size: 32px;
+  font-weight: 700;
   line-height: 1;
   color: var(--sheet-blue);
 }
@@ -586,7 +594,7 @@ textarea:focus {
 .sheet table.marks th {
   background: linear-gradient(#fbc6de, #fde5ef);
   color: var(--sheet-blue);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 25px;
   height: 50px;
   border: 2px solid var(--grid);
@@ -594,10 +602,11 @@ textarea:focus {
   line-height: 1;
 }
 .sheet table.marks td {
-  height: 52px;
+  height: 42px;
   border: 2px solid var(--grid);
   text-align: center;
   font-size: 35px;
+  font-weight: 700;
   line-height: 1;
   color: var(--sheet-blue);
   padding: 0 4px;
@@ -708,10 +717,6 @@ textarea:focus {
   }
   .preview-col {
     position: static;
-  }
-  /* Keep the stage from becoming too tall on tablet */
-  .stage {
-    max-height: 480px;
   }
 }
 
@@ -824,8 +829,15 @@ textarea:focus {
     font-size: 12px;
   }
   .stage {
-    max-height: 320px;
     border-radius: 8px;
+  }
+  /* Keep each notebook page readable on phones; the preview stacks them. */
+  .scaler,
+  .sheet {
+    width: 724px;
+  }
+  .sheet {
+    grid-template-columns: 1fr;
   }
   .preview-head h2 {
     font-size: 14px;
@@ -849,9 +861,6 @@ textarea:focus {
   .btn {
     padding: 9px 10px;
     font-size: 11.5px;
-  }
-  .stage {
-    max-height: 260px;
   }
   .entry-table {
     min-width: 380px;
@@ -895,5 +904,10 @@ textarea:focus {
   }
   .scaler {
     transform: scale(var(--print-scale)) !important;
+    width: 1448px !important;
+  }
+  .sheet {
+    width: 1448px !important;
+    grid-template-columns: 1fr 1fr !important;
   }
 }

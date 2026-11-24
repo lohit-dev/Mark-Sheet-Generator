@@ -227,7 +227,7 @@
       const ctx =
         fitTitle.ctx ||
         (fitTitle.ctx = document.createElement("canvas").getContext("2d"));
-      ctx.font = "700 38px SheetSerif, Georgia, serif";
+      ctx.font = '700 38px "Kalam", "SheetHand", "Patrick Hand SC", cursive';
       const w = ctx.measureText(text).width + text.length * 0.5;
       const avail = span.parentElement.offsetWidth * 0.78 - 6;
       if (w > avail) size = Math.max(18, Math.floor((38 * avail) / w));
@@ -278,15 +278,21 @@
     const sheet = $("marksSheet");
     const w = stage.clientWidth;
     if (!w) return;
+    const stacked = window.matchMedia("(max-width: 620px)").matches;
+    const designW = stacked ? DESIGN_W / 2 : DESIGN_W;
     const h = sheet.offsetHeight;
-    const s = w / DESIGN_W;
+    const s = w / designW;
     $("scaler").style.transform = "scale(" + s + ")";
     stage.style.height = Math.ceil(h * s) + "px";
     const root = document.documentElement.style;
-    root.setProperty("--sheet-h", h);
+    const printH = Math.max(
+      $("tblA").closest(".page").offsetHeight,
+      $("tblB").closest(".page").offsetHeight,
+    );
+    root.setProperty("--sheet-h", printH);
     root.setProperty(
       "--print-scale",
-      Math.min(748 / DESIGN_W, 1060 / h).toFixed(4),
+      Math.min(748 / DESIGN_W, 1060 / printH).toFixed(4),
     );
   }
 
