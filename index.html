@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CNR Marks Sheet Generator</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ── Top bar ───────────────────────────────────────────────── -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">CNR</span>
+        <span>
+          <strong>Marks Sheet Generator</strong>
+          <small>Enter marks · Calculate · Print or download</small>
+        </span>
+      </div>
+      <span class="saved" id="savedNote"
+        >Changes are saved in this browser</span
+      >
+    </header>
+
+    <!-- ── Main layout ───────────────────────────────────────────── -->
+    <main class="layout">
+      <!-- Left column: controls -->
+      <section class="workspace">
+        <!-- Card 1 · Exam details -->
+        <section class="card">
+          <h2>1 · Exam details</h2>
+          <div class="form-grid">
+            <label
+              >Class
+              <select id="className">
+                <option value="I">I</option>
+                <option value="II">II</option>
+                <option value="III">III</option>
+                <option value="IV">IV</option>
+                <option value="V">V</option>
+                <option value="VI">VI</option>
+                <option value="VII">VII</option>
+                <option value="VIII" selected>VIII</option>
+                <option value="IX">IX</option>
+                <option value="X">X</option>
+              </select>
+            </label>
+            <label>Branch name <input id="branch" autocomplete="off" /></label>
+            <label
+              >Exam
+              <select id="exam">
+                <option value="MIDTERM">MIDTERM</option>
+                <option value="FA-1">FA-1</option>
+                <option value="FA-2">FA-2</option>
+                <option value="FA-3">FA-3</option>
+                <option value="FA-4">FA-4</option>
+                <option value="SA-1" selected>SA-1</option>
+                <option value="SA-2">SA-2</option>
+                <option value="RT-1">RT-1</option>
+                <option value="RT-2">RT-2</option>
+                <option value="RT-3">RT-3</option>
+                <option value="RT-4">RT-4</option>
+                <option value="RT-5">RT-5</option>
+                <option value="RT-6">RT-6</option>
+                <option value="RT-7">RT-7</option>
+                <option value="RT-8">RT-8</option>
+                <option value="RT-9">RT-9</option>
+                <option value="RT-10">RT-10</option>
+              </select>
+            </label>
+            <label>Subject <input id="subject" autocomplete="off" /></label>
+            <label class="wide"
+              >Teacher name
+              <input id="teacher" autocomplete="off" />
+            </label>
+            <label
+              >Maximum marks
+              <input id="maxMarks" type="number" min="1" step="any" />
+            </label>
+            <label
+              >Internal marks out of
+              <input id="internalMax" type="number" min="0" step="any" />
+            </label>
+          </div>
+
+          <div class="mode-row">
+            <div>
+              <strong>Marks format</strong>
+              <small>Internal + External are added to make the total</small>
+            </div>
+            <div class="segmented" role="group" aria-label="Marks format">
+              <button type="button" class="segment active" data-mode="split">
+                Internal + External
+              </button>
+              <button type="button" class="segment" data-mode="total">
+                Total only
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 2 · Student marks -->
+        <section class="card">
+          <div class="card-head">
+            <h2>
+              2 · Student marks
+              <span class="badge" id="studentCount">0 students</span>
+            </h2>
+            <button class="link-danger" id="clearStudents" type="button">
+              Clear all
+            </button>
+          </div>
+
+          <!-- Entry table -->
+          <div class="entry-wrap" id="entryWrap">
+            <table class="entry-table">
+              <thead id="entryHead"></thead>
+              <tbody id="entryBody"></tbody>
+            </table>
+            <div class="empty" id="emptyState">
+              <strong>No students yet</strong>
+              <span
+                >Add a student, or import a class list from Excel / CSV.</span
+              >
+            </div>
+          </div>
+
+          <!-- Validation banner -->
+          <div class="issues-wrap" id="issuesWrap" hidden>
+            <span class="issues-icon" aria-hidden="true">⚠</span>
+            <p class="issues-text" id="issuesText"></p>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="actions">
+            <button class="btn primary" id="addStudent" type="button">
+              + Add student
+            </button>
+            <label class="btn light file-btn"
+              >Import Excel / CSV
+              <input id="fileInput" type="file" accept=".xlsx,.xls,.csv,.txt" />
+            </label>
+            <button class="btn quiet" id="exportCsv" type="button">
+              Export CSV
+            </button>
+            <button class="btn quiet" id="downloadTemplate" type="button">
+              CSV template
+            </button>
+          </div>
+
+          <!-- Paste import -->
+          <details class="paste">
+            <summary>Or paste names and marks</summary>
+            <textarea
+              id="csvPaste"
+              rows="5"
+              placeholder="Name, External, Internal&#10;A. Student, 78, 20&#10;B. Student, Ab, Ab"
+            ></textarea>
+            <div class="actions">
+              <button class="btn light" id="importPaste" type="button">
+                Import pasted data
+              </button>
+              <button class="btn quiet" id="loadSample" type="button">
+                Load sample
+              </button>
+            </div>
+          </details>
+
+          <p class="helper">
+            Type <b>Ab</b> for absent students — they appear as AB and are
+            excluded from totals. Press <b>Enter</b> to jump to the next row.
+            Average = grand total ÷ (present students × max marks) × 100.
+          </p>
+        </section>
+
+        <!-- Card 3 · Output -->
+        <section class="card">
+          <h2>3 · Output</h2>
+          <div class="actions no-top">
+            <button class="btn primary" id="downloadPng" type="button">
+              Download PNG
+            </button>
+            <button class="btn light" id="printSheet" type="button">
+              Print / Save as PDF
+            </button>
+          </div>
+          <p class="helper">
+            PNG exports at high resolution. For PDF, choose "Save as PDF" in the
+            print dialog.
+          </p>
+        </section>
+      </section>
+      <!-- /workspace -->
+
+      <!-- Right column: live preview -->
+      <aside class="preview-col">
+        <div class="preview-head">
+          <h2>Live preview</h2>
+          <span class="count" id="previewCount">0 students</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="scaler" id="scaler">
+            <article class="sheet" id="marksSheet">
+              <div class="spine"></div>
+
+              <!-- Left page -->
+              <section class="page left">
+                <img class="art tl" data-art="flowerTL" alt="" />
+                <div class="ribbon">
+                  <img data-art="ribbon" alt="" /><span id="sheetTitle"></span>
+                </div>
+                <div class="subtitle" id="sheetSubtitle"></div>
+                <table class="marks" id="tblA"></table>
+                <div class="foot">
+                  <img class="art fbl" data-art="flowerBL" alt="" />
+                  <div class="label avg">
+                    <img data-art="labelPinkL" alt="" />
+                    <span>Average = <b id="averageValue">0.00%</b></span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Right page -->
+              <section class="page right">
+                <img class="art tl" data-art="flowerTL" alt="" />
+                <img class="art tr" data-art="flowerTR" alt="" />
+                <table class="marks" id="tblB"></table>
+                <div class="foot">
+                  <img class="art fbl" data-art="flowerBL" alt="" />
+                  <div class="center">
+                    <div class="label tot">
+                      <img data-art="labelYellowL" alt="" />
+                      <span>Total = <b id="grandTotal">0</b></span>
+                    </div>
+                    <div class="teacher" id="teacherLine"></div>
+                  </div>
+                  <img class="art fbr" data-art="flowerBR" alt="" />
+                </div>
+              </section>
+            </article>
+          </div>
+        </div>
+      </aside>
+    </main>
+    <!-- /layout -->
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ── Scripts ───────────────────────────────────────────────── -->
+    <script src="assets.js"></script>
+
+    <!-- SheetJS: local vendor copy first, CDN fallback -->
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "vendor/xlsx.full.min.js";
+        s.onerror = function () {
+          var fb = document.createElement("script");
+          fb.src =
+            "https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js";
+          document.head.appendChild(fb);
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+
+    <!-- html2canvas: local vendor copy first, CDN fallback -->
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "vendor/html2canvas.min.js";
+        s.onerror = function () {
+          var fb = document.createElement("script");
+          fb.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
+          document.head.appendChild(fb);
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
