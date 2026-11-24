@@ -519,7 +519,7 @@ textarea:focus {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-top: 156px;
+  padding-top: 132px;
   min-width: 0;
 }
 .sheet .page.left {
@@ -537,14 +537,14 @@ textarea:focus {
   position: absolute;
 }
 .sheet .art.tl {
-  left: 8px;
+  left: -14px;
   top: 6px;
-  width: 32.6%;
+  width: 26%;
 }
 .sheet .art.tr {
-  right: 8px;
+  right: -14px;
   top: 6px;
-  width: 32.6%;
+  width: 26%;
 }
 
 .sheet .ribbon {
@@ -556,7 +556,8 @@ textarea:focus {
 }
 .sheet .ribbon img {
   width: 100%;
-  height: auto;
+  height: 90px;
+  object-fit: fill;
 }
 .sheet .ribbon span {
   position: absolute;
@@ -579,9 +580,9 @@ textarea:focus {
   position: absolute;
   left: 0;
   right: 0;
-  top: 116px;
+  top: 100px;
   text-align: center;
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 700;
   line-height: 1;
   color: var(--sheet-blue);
@@ -640,7 +641,7 @@ textarea:focus {
 .sheet .art.fbl,
 .sheet .art.fbr {
   position: relative;
-  width: 26.25%;
+  width: 22%;
   flex: none;
 }
 .sheet .page.left .foot {
@@ -666,7 +667,8 @@ textarea:focus {
 }
 .sheet .label img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: fill;
 }
 .sheet .label span {
   position: absolute;
@@ -688,23 +690,51 @@ textarea:focus {
 }
 .sheet .label.avg {
   width: 56.6%;
+  height: auto;
+  aspect-ratio: 3.8;
 }
 .sheet .label.avg span {
-  font-size: 44px;
+  font-size: 50px;
 }
 .sheet .label.tot {
   width: 45.6%;
+  height: auto;
+  aspect-ratio: 670 / 212;
 }
 .sheet .label.tot span {
-  font-size: 44px;
+  font-size: 50px;
 }
 .sheet .teacher {
   font-family: "Patrick Hand", cursive;
   font-weight: 700;
-  font-size: 25px;
+  font-size: 34px;
   color: var(--sheet-blue);
   white-space: normal;
   text-align: center;
+}
+
+/* The total-only reference uses a title centered across the full spread. */
+.sheet.total-only .page.left .ribbon {
+  left: 100%;
+}
+.sheet.total-only .page.right .art.tl {
+  display: none;
+}
+.sheet.total-only .page.left .ribbon img {
+  height: 110px;
+}
+.sheet.total-only .page {
+  padding-top: 156px;
+}
+.sheet.total-only .page.left .subtitle {
+  top: 114px;
+  font-size: 40px;
+}
+.sheet.total-only .page.left .subtitle {
+  left: 100%;
+  right: auto;
+  width: 200%;
+  transform: translateX(-50%);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -843,6 +873,15 @@ textarea:focus {
   .sheet {
     grid-template-columns: 1fr;
   }
+  .sheet.total-only .page.left .ribbon {
+    left: 50%;
+  }
+  .sheet.total-only .page.left .subtitle {
+    left: 0;
+    right: 0;
+    width: auto;
+    transform: none;
+  }
   .preview-head h2 {
     font-size: 14px;
   }
@@ -913,5 +952,14 @@ textarea:focus {
   .sheet {
     width: 1448px !important;
     grid-template-columns: 1fr 1fr !important;
+  }
+  .sheet.total-only .page.left .ribbon {
+    left: 100%;
+  }
+  .sheet.total-only .page.left .subtitle {
+    left: 100%;
+    right: auto;
+    width: 200%;
+    transform: translateX(-50%);
   }
 }

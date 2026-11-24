@@ -45,8 +45,26 @@ try {
   await page.locator("#csvPaste").fill(sampleRows.join("\n"));
   await page.locator("#importPaste").click();
   await page.waitForFunction(() => window.__cnr.students.length === 31);
+  await page.locator("#className").selectOption("X");
+  await page.locator("#exam").selectOption("MIDTERM");
+  await page.locator("#subject").fill("MATHS");
+  await page.evaluate(async () => {
+    await Promise.race([
+      document.fonts.ready,
+      new Promise((resolve) => setTimeout(resolve, 12000)),
+    ]);
+  });
   await page.locator("#branch").fill("North Valley Regional Campus Branch");
   await page.locator("#teacher").fill("D.V.N.S. Rama Rao, Senior Mathematics Teacher");
+  const longHeaderFits = await page.evaluate(() =>
+    ["#sheetTitle", "#sheetSubtitle", "#teacherLine"].every((selector) => {
+      const element = document.querySelector(selector);
+      return element.scrollWidth <= element.clientWidth + 1;
+    }),
+  );
+  if (!longHeaderFits) failed = true;
+  await page.locator("#branch").fill("CNR");
+  await page.locator("#teacher").fill("D.V.N.S. Rama Rao");
   await page.evaluate(async () => {
     await Promise.race([
       document.fonts.ready,
@@ -72,6 +90,13 @@ try {
       const sheet = document.querySelector("#marksSheet");
       const pages = [...sheet.querySelectorAll(".page")];
       const bounds = pages.map((element) => element.getBoundingClientRect());
+      const title = document.querySelector("#sheetTitle").getBoundingClientRect();
+      const flower = document.querySelector(".page.left .art.tl").getBoundingClientRect();
+      const subtitle = document.querySelector("#sheetSubtitle").getBoundingClientRect();
+      const ribbonImage = document.querySelector(".page.left .ribbon img").getBoundingClientRect();
+      const firstTable = document.querySelector("#tblA").getBoundingClientRect();
+      const averageLabel = document.querySelector(".label.avg").getBoundingClientRect();
+      const teacher = document.querySelector("#teacherLine");
       return {
         viewport: `${innerWidth}x${innerHeight}`,
         documentWidth: document.documentElement.scrollWidth,
@@ -80,6 +105,11 @@ try {
         gridColumns: getComputedStyle(sheet).gridTemplateColumns,
         firstPageTop: Math.round(bounds[0].top),
         secondPageTop: Math.round(bounds[1].top),
+        titleOverlapsFlower: title.left < flower.right && title.right > flower.left && title.top < flower.bottom && title.bottom > flower.top,
+        subtitleGapAfterRibbon: Math.round(subtitle.top - ribbonImage.bottom),
+        tableGapAfterSubtitle: Math.round(firstTable.top - subtitle.bottom),
+        pinkLabelRatio: Number((averageLabel.width / averageLabel.height).toFixed(2)),
+        teacherSingleLine: !teacher.textContent.includes("\n"),
         titleFont: getComputedStyle(document.querySelector("#sheetTitle")).fontFamily,
         tableFont: getComputedStyle(document.querySelector("#tblA td")).fontFamily,
         titleWeight: getComputedStyle(document.querySelector("#sheetTitle")).fontWeight,
@@ -91,6 +121,10 @@ try {
           total: document.querySelector(".label.tot span").style.fontSize,
           teacher: document.querySelector("#teacherLine").style.fontSize,
         },
+        labelBoxes: [".label.avg", ".label.tot"].map((selector) => {
+          const box = document.querySelector(selector).getBoundingClientRect();
+          return { width: Math.round(box.width), height: Math.round(box.height) };
+        }),
         textOverflow: [
           "#sheetTitle",
           "#sheetSubtitle",
@@ -125,23 +159,51 @@ try {
       result.titleFont.includes("Patrick Hand") &&
       result.tableFont.includes("Patrick Hand") &&
       !result.textOverflow;
-    if (!layoutOkay || !widthOkay || !fontOkay) failed = true;
+    const headerOkay =
+      !result.titleOverlapsFlower &&
+      result.subtitleGapAfterRibbon >= 0 &&
+      result.subtitleGapAfterRibbon <= 10 &&
+      result.tableGapAfterSubtitle >= 0 &&
+      result.tableGapAfterSubtitle <= 10 &&
+      result.pinkLabelRatio >= 3.75 &&
+      result.pinkLabelRatio <= 3.85 &&
+      result.teacherSingleLine;
+    if (!layoutOkay || !widthOkay || !fontOkay || !headerOkay) failed = true;
 
     const screenshot = `preview-${viewport.name}.png`;
     await page.screenshot({ path: resolve(output, screenshot), fullPage: true });
     console.log(
-      `${layoutOkay && widthOkay && fontOkay ? "PASS" : "FAIL"} ${viewport.name}: ` +
+      `${layoutOkay && widthOkay && fontOkay && headerOkay ? "PASS" : "FAIL"} ${viewport.name}: ` +
         JSON.stringify(result) +
         ` | screenshot: ${screenshot}`,
     );
   }
 
+  await page.locator('[data-mode="total"]').click();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.waitForTimeout(150);
+  const totalHeaderCentered = await page.evaluate(() => {
+    const sheet = document.querySelector("#marksSheet").getBoundingClientRect();
+    const ribbon = document.querySelector(".ribbon").getBoundingClientRect();
+    const subtitle = document.querySelector("#sheetSubtitle").getBoundingClientRect();
+    const center = sheet.left + sheet.width / 2;
+    return Math.abs(ribbon.left + ribbon.width / 2 - center) < 2 &&
+      Math.abs(subtitle.left + subtitle.width / 2 - center) < 2;
+  });
+  if (!totalHeaderCentered) failed = true;
+  await page.screenshot({ path: resolve(output, "preview-total-desktop.png"), fullPage: true });
+  console.log(`${totalHeaderCentered ? "PASS" : "FAIL"} total-only title is centered across the spread`);
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ media: "print" });
+  await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
   const printResult = await page.evaluate(() => {
     const sheet = document.querySelector("#marksSheet");
     const pages = [...sheet.querySelectorAll(".page")];
     const pageHeight = Math.max(...pages.map((element) => element.offsetHeight));
+    const sheetBounds = sheet.getBoundingClientRect();
+    const ribbonBounds = document.querySelector(".ribbon").getBoundingClientRect();
+    const subtitleBounds = document.querySelector("#sheetSubtitle").getBoundingClientRect();
     const configuredHeight = Number.parseFloat(
       getComputedStyle(document.documentElement).getPropertyValue("--sheet-h"),
     );
@@ -149,11 +211,15 @@ try {
       columns: getComputedStyle(sheet).gridTemplateColumns.trim().split(/\s+/).length,
       pageHeight,
       configuredHeight,
+      titleCenterOffset: Math.abs(ribbonBounds.left + ribbonBounds.width / 2 - (sheetBounds.left + sheetBounds.width / 2)),
+      subtitleCenterOffset: Math.abs(subtitleBounds.left + subtitleBounds.width / 2 - (sheetBounds.left + sheetBounds.width / 2)),
     };
   });
   const printOkay =
     printResult.columns === 2 &&
-    Math.abs(printResult.pageHeight - printResult.configuredHeight) <= 1;
+    Math.abs(printResult.pageHeight - printResult.configuredHeight) <= 1 &&
+    printResult.titleCenterOffset < 2 &&
+    printResult.subtitleCenterOffset < 2;
   if (!printOkay) failed = true;
   console.log(`${printOkay ? "PASS" : "FAIL"} phone print layout: ${JSON.stringify(printResult)}`);
 } catch (error) {

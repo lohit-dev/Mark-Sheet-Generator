@@ -37,8 +37,8 @@
     flowerBR:         art("flower-br.svg"),
     flowerGarland:    art("flower-garland.svg"),
     ribbon:           art("ribbon.svg"),
-    labelPinkL:       art("label-pink.svg"),
-    labelYellowL:     art("label-yellow.svg"),
+    labelPinkL:       art("label-pink-large.svg"),
+    labelYellowL:     art("label-yellow-large.svg"),
     labelPinkLarge:   art("label-pink-large.svg"),
     labelYellowLarge: art("label-yellow-large.svg"),
   };

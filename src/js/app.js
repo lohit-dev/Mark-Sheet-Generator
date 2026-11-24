@@ -258,38 +258,53 @@
   function fitTitle(text) {
     const span = $("sheetTitle");
     const ribbon = span.parentElement;
-    const pageWidth = ribbon.parentElement.clientWidth;
-    const maxRibbonWidth = pageWidth * 0.84;
-    const oneLineAt32 = measureText(text, 32, HAND_FONT);
-    const maxTextWidth = maxRibbonWidth * 0.78 - 6;
-    const lines = oneLineAt32 <= maxTextWidth ? [text] : balancedLines(text, 32, HAND_FONT);
-    const lineWidth = Math.max(...lines.map((line) => measureText(line, lines.length > 1 ? 32 : 38, HAND_FONT)));
-    const baseSize = lines.length > 1 ? 32 : 38;
+    const sheet = $("marksSheet");
+    const printLayout = window.matchMedia("print").matches;
+    const mobileStack = window.matchMedia("(max-width: 620px)").matches && !printLayout;
+    const widthBasis = mode === "total" && !mobileStack
+      ? sheet.clientWidth
+      : ribbon.parentElement.clientWidth;
+    const maxRibbonWidth = widthBasis * (mode === "total" ? 0.84 : 0.92);
+    const titleSize = mode === "total" ? 38 : 31;
+    const oneLineWidth = measureText(text, titleSize, HAND_FONT);
+    const maxTextWidth = maxRibbonWidth * 0.7 - 32;
+    const lines = oneLineWidth <= maxTextWidth ? [text] : balancedLines(text, titleSize, HAND_FONT);
+    const lineWidth = Math.max(...lines.map((line) => measureText(line, lines.length > 1 ? 32 : titleSize, HAND_FONT)));
+    const baseSize = lines.length > 1 ? 32 : titleSize;
     const ribbonWidth = Math.max(
-      pageWidth * 0.62,
-      Math.min(maxRibbonWidth, lineWidth / 0.78 + 6),
+      widthBasis * (mode === "total" ? 0.62 : 0.68),
+      Math.min(maxRibbonWidth, lineWidth / 0.7 + 40),
     );
     span.textContent = lines.join("\n");
     span.style.whiteSpace = lines.length > 1 ? "pre-line" : "nowrap";
     span.style.lineHeight = lines.length > 1 ? "0.9" : "1";
     ribbon.style.width = ribbonWidth + "px";
-    const textWidth = ribbonWidth * 0.78 - 6;
-    span.style.fontSize =
-      Math.max(18, Math.min(baseSize, Math.floor((baseSize * textWidth) / lineWidth))) +
-      "px";
+    ribbon.querySelector("img").style.height =
+      lines.length > 1 ? ribbonWidth * (198 / 791) + "px" : mode === "total" ? "110px" : "90px";
+    const textWidth = ribbonWidth * 0.7 - 32;
+    const fittedSize = Math.max(18, Math.min(baseSize, Math.floor((baseSize * textWidth) / lineWidth)));
+    span.style.fontSize = fittedSize + "px";
+    span.style.left = "50%";
+    span.style.right = "auto";
+    span.style.width = "max-content";
+    span.style.transform = "translateX(-50%)";
   }
 
   function fitLabel(selector) {
     const label = document.querySelector(selector);
     const span = label.querySelector("span");
     const pageWidth = label.closest(".page").clientWidth;
-    const maxWidth = Math.min(label.parentElement.clientWidth, pageWidth * 0.62);
-    const minWidth = Math.min(maxWidth, pageWidth * 0.3);
+    const maxWidth = Math.min(
+      pageWidth * 0.66,
+      label.parentElement.clientWidth + pageWidth * 0.14,
+    );
+    const minWidth = Math.min(maxWidth, pageWidth * 0.5);
     const text = span.textContent.replace(/\s+/g, " ").trim();
-    const measured = measureText(text, 44, SCRIPT_FONT);
-    const width = Math.max(minWidth, Math.min(maxWidth, measured / 0.8 + 18));
+    const measured = measureText(text, 50, SCRIPT_FONT);
+    const width = Math.max(minWidth, Math.min(maxWidth, measured / 0.72 + 20));
     label.style.width = width + "px";
-    span.style.fontSize = Math.max(20, Math.min(44, (width - 18) * 0.8 * 44 / measured)) + "px";
+    label.style.height = width / (selector === ".label.avg" ? 3.8 : 670 / 212) + "px";
+    span.style.fontSize = Math.max(22, Math.min(50, (width - 20) * 0.72 * 50 / measured)) + "px";
   }
 
   function fitSheetText() {
@@ -297,11 +312,18 @@
     fitText(
       subtitle,
       subtitle.textContent,
-      32,
+      mode === "total" ? 40 : 36,
       subtitle.parentElement.clientWidth * 0.9,
       HAND_FONT,
       18,
     );
+    const ribbonHeight = Number.parseFloat($('sheetTitle').parentElement.querySelector("img").style.height);
+    const subtitleSize = Number.parseFloat(subtitle.style.fontSize);
+    subtitle.style.top = ribbonHeight + 4 + "px";
+    const headerHeight = ribbonHeight + 4 + subtitleSize + 2;
+    document.querySelectorAll("#marksSheet .page").forEach((page) => {
+      page.style.paddingTop = headerHeight + "px";
+    });
     fitLabel(".label.avg");
     fitLabel(".label.tot");
 
@@ -309,20 +331,20 @@
     const teacherText = teacher.textContent;
     const teacherWidth = teacher.parentElement.clientWidth * 0.94;
     const teacherLines =
-      measureText(teacherText, 25, SCRIPT_FONT) > teacherWidth
-        ? balancedLines(teacherText, 25, SCRIPT_FONT)
+      measureText(teacherText, 34, SCRIPT_FONT) > teacherWidth
+        ? balancedLines(teacherText, 34, SCRIPT_FONT)
         : [teacherText];
     teacher.textContent = teacherLines.join("\n");
     teacher.style.whiteSpace = teacherLines.length > 1 ? "pre-line" : "nowrap";
     const longestTeacherLine = teacherLines.reduce((longest, line) =>
-      measureText(line, 25, SCRIPT_FONT) > measureText(longest, 25, SCRIPT_FONT)
+      measureText(line, 34, SCRIPT_FONT) > measureText(longest, 34, SCRIPT_FONT)
         ? line
         : longest,
     );
     fitText(
       teacher,
       longestTeacherLine,
-      25,
+      34,
       teacherWidth,
       SCRIPT_FONT,
       16,
@@ -331,6 +353,7 @@
 
   function render() {
     const d = details();
+    $("marksSheet").classList.toggle("total-only", mode === "total");
     fitTitle(
       [d.className, d.branch, d.exam, d.subject]
         .filter(Boolean)
@@ -372,7 +395,9 @@
     const sheet = $("marksSheet");
     const w = stage.clientWidth;
     if (!w) return;
-    const stacked = window.matchMedia("(max-width: 620px)").matches;
+    const stacked =
+      window.matchMedia("(max-width: 620px)").matches &&
+      !window.matchMedia("print").matches;
     const designW = stacked ? DESIGN_W / 2 : DESIGN_W;
     const h = sheet.offsetHeight;
     const s = w / designW;
@@ -810,6 +835,8 @@
 
     if (window.ResizeObserver) new ResizeObserver(fit).observe($("stage"));
     window.addEventListener("resize", fit);
+    window.addEventListener("beforeprint", render);
+    window.addEventListener("afterprint", render);
   }
 
   /* ---------- start ---------- */
