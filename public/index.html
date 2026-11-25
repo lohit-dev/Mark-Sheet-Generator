@@ -2,36 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CNR Marks Sheet Generator</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1d3f94" />
+    <title>CNR Marks Sheet</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231d3f94%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2711%27 font-family=%27Arial%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27white%27%3ECNR%3C/text%3E%3C/svg%3E" />
     <link rel="stylesheet" href="css/fonts.css" />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
-  <body>
+  <body data-tab="marks">
     <!-- ── Top bar ───────────────────────────────────────────────── -->
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-mark">CNR</span>
-        <span>
-          <strong>Marks Sheet Generator</strong>
-          <small>Enter marks · Calculate · Print or download</small>
-        </span>
+    <header class="appbar">
+      <span class="brand-mark">CNR</span>
+      <div class="appbar-text">
+        <strong id="barTitle">Marks Sheet</strong>
+        <small id="barSub">Enter marks, then make the sheet</small>
       </div>
-      <span class="saved" id="savedNote"
-        >Changes are saved in this browser</span
-      >
     </header>
 
-    <!-- ── Main layout ───────────────────────────────────────────── -->
-    <main class="layout">
-      <!-- Left column: controls -->
-      <section class="workspace">
-        <!-- Card 1 · Exam details -->
-        <section class="card">
-          <h2>1 · Exam details</h2>
+    <main class="app">
+      <!-- ═══ Step 1 · Details ═══════════════════════════════════ -->
+      <section class="panel" id="panel-details" aria-label="Exam details">
+        <div class="card">
+          <h2>Exam details</h2>
           <div class="form-grid">
-            <label
-              >Class
+            <label>
+              <span>Class</span>
               <select id="className">
                 <option value="I">I</option>
                 <option value="II">II</option>
@@ -45,9 +43,8 @@
                 <option value="X">X</option>
               </select>
             </label>
-            <label>Branch name <input id="branch" autocomplete="off" /></label>
-            <label
-              >Exam
+            <label>
+              <span>Exam</span>
               <select id="exam">
                 <option value="MIDTERM">MIDTERM</option>
                 <option value="FA-1">FA-1</option>
@@ -68,136 +65,152 @@
                 <option value="RT-10">RT-10</option>
               </select>
             </label>
-            <label>Subject <input id="subject" autocomplete="off" /></label>
-            <label class="wide"
-              >Teacher name
-              <input id="teacher" autocomplete="off" />
+            <label>
+              <span>Branch</span>
+              <input id="branch" autocomplete="off" enterkeyhint="next" />
             </label>
-            <label
-              >Maximum marks
-              <input id="maxMarks" type="number" min="1" step="any" />
+            <label>
+              <span>Subject</span>
+              <input id="subject" autocomplete="off" enterkeyhint="next" />
             </label>
-            <label
-              >Internal marks out of
-              <input id="internalMax" type="number" min="0" step="any" />
+            <label class="wide">
+              <span>Teacher name</span>
+              <input id="teacher" autocomplete="off" enterkeyhint="done" />
+            </label>
+            <label>
+              <span>Maximum marks</span>
+              <input
+                id="maxMarks"
+                type="number"
+                inputmode="decimal"
+                min="1"
+                step="any"
+              />
+            </label>
+            <label id="internalField">
+              <span>Internal marks out of</span>
+              <input
+                id="internalMax"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                step="any"
+              />
             </label>
           </div>
+        </div>
 
-          <div class="mode-row">
-            <div>
-              <strong>Marks format</strong>
-              <small>Internal + External are added to make the total</small>
-            </div>
-            <div class="segmented" role="group" aria-label="Marks format">
-              <button type="button" class="segment active" data-mode="split">
-                Internal + External
-              </button>
-              <button type="button" class="segment" data-mode="total">
-                Total only
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Card 2 · Student marks -->
-        <section class="card">
-          <div class="card-head">
-            <h2>
-              2 · Student marks
-              <span class="badge" id="studentCount">0 students</span>
-            </h2>
-            <button class="link-danger" id="clearStudents" type="button">
-              Clear all
+        <div class="card">
+          <h2>How are marks written?</h2>
+          <div class="segmented" role="group" aria-label="Marks format">
+            <button type="button" class="segment active" data-mode="split">
+              <strong>External + Internal</strong>
+              <small>Three columns, total is added</small>
+            </button>
+            <button type="button" class="segment" data-mode="total">
+              <strong>Total only</strong>
+              <small>One column, one mark each</small>
             </button>
           </div>
+        </div>
 
-          <!-- Entry table -->
-          <div class="entry-wrap" id="entryWrap">
-            <table class="entry-table">
-              <thead id="entryHead"></thead>
-              <tbody id="entryBody"></tbody>
-            </table>
-            <div class="empty" id="emptyState">
-              <strong>No students yet</strong>
-              <span
-                >Add a student, or import a class list from Excel / CSV.</span
-              >
-            </div>
-          </div>
+        <button class="btn primary big next-step" id="toMarks" type="button">
+          Next: enter marks
+        </button>
+      </section>
 
-          <!-- Validation banner -->
-          <div class="issues-wrap" id="issuesWrap" hidden>
-            <span class="issues-icon" aria-hidden="true">⚠</span>
-            <p class="issues-text" id="issuesText"></p>
-          </div>
+      <!-- ═══ Step 2 · Marks ═════════════════════════════════════ -->
+      <section class="panel" id="panel-marks" aria-label="Student marks">
+        <div class="summary" aria-live="polite">
+          <div><b id="sumStudents">0</b><span>Students</span></div>
+          <div><b id="sumAbsent">0</b><span>Absent</span></div>
+          <div><b id="sumAverage">0.00%</b><span>Average</span></div>
+          <button class="sum-add" id="addTop" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            <span>Add</span>
+          </button>
+        </div>
 
-          <!-- Action buttons -->
-          <div class="actions">
-            <button class="btn primary" id="addStudent" type="button">
-              + Add student
-            </button>
-            <label class="btn light file-btn"
-              >Import Excel / CSV
+        <button class="issues" id="issues" type="button" hidden></button>
+
+        <div class="students" id="students"></div>
+
+        <div class="empty" id="emptyState">
+          <strong>No students yet</strong>
+          <span
+            >Tap “Add student” to start typing, or use “Import, export and
+            more” below.</span
+          >
+        </div>
+
+        <button class="btn light big add-wide" id="addStudent" type="button">
+          + Add student
+        </button>
+
+        <button class="btn primary big see-sheet" id="toSheet" type="button">
+          Next: see the sheet
+        </button>
+
+        <details class="more" id="moreTools">
+          <summary>Import, export and more</summary>
+          <div class="more-body">
+            <label class="btn light file-btn">
+              Import Excel / CSV file
               <input id="fileInput" type="file" accept=".xlsx,.xls,.csv,.txt" />
             </label>
-            <button class="btn quiet" id="exportCsv" type="button">
-              Export CSV
-            </button>
-            <button class="btn quiet" id="downloadTemplate" type="button">
-              CSV template
-            </button>
-          </div>
-
-          <!-- Paste import -->
-          <details class="paste">
-            <summary>Or paste names and marks</summary>
+            <p class="hint">
+              Or paste a list. One student per line, like
+              <b>Name, External, Internal</b>. Names alone also work.
+            </p>
             <textarea
               id="csvPaste"
               rows="5"
               placeholder="Name, External, Internal&#10;A. Student, 78, 20&#10;B. Student, Ab, Ab"
             ></textarea>
-            <div class="actions">
-              <button class="btn light" id="importPaste" type="button">
-                Import pasted data
+            <button class="btn light" id="importPaste" type="button">
+              Import pasted list
+            </button>
+            <div class="row-buttons">
+              <button class="btn quiet" id="exportCsv" type="button">
+                Export CSV
+              </button>
+              <button class="btn quiet" id="downloadTemplate" type="button">
+                CSV template
               </button>
               <button class="btn quiet" id="loadSample" type="button">
                 Load sample
               </button>
             </div>
-          </details>
-
-          <p class="helper">
-            Type <b>Ab</b> for absent students — they appear as AB and are
-            excluded from totals. Press <b>Enter</b> to jump to the next row.
-            Average = grand total ÷ (present students × max marks) × 100.
-          </p>
-        </section>
-
-        <!-- Card 3 · Output -->
-        <section class="card">
-          <h2>3 · Output</h2>
-          <div class="actions no-top">
-            <button class="btn primary" id="downloadPng" type="button">
-              Download PNG
-            </button>
-            <button class="btn light" id="printSheet" type="button">
-              Print / Save as PDF
+            <button class="btn danger" id="clearStudents" type="button">
+              Remove all students
             </button>
           </div>
-          <p class="helper">
-            PNG exports at high resolution. For PDF, choose "Save as PDF" in the
-            print dialog.
-          </p>
-        </section>
+        </details>
       </section>
-      <!-- /workspace -->
 
-      <!-- Right column: live preview -->
-      <aside class="preview-col">
-        <div class="preview-head">
-          <h2>Live preview</h2>
-          <span class="count" id="previewCount">0 students</span>
+      <!-- ═══ Step 3 · Sheet ═════════════════════════════════════ -->
+      <section class="panel" id="panel-sheet" aria-label="Marks sheet">
+        <div class="card sheet-actions">
+          <div class="totals">
+            <div><span>Students</span><b id="totStudents">0</b></div>
+            <div><span>Grand total</span><b id="totGrand">0</b></div>
+            <div><span>Average</span><b id="totAverage">0.00%</b></div>
+          </div>
+          <button class="btn primary big" id="sharePng" type="button" hidden>
+            Share picture
+          </button>
+          <button class="btn primary big" id="downloadPng" type="button">
+            Save picture
+          </button>
+          <button class="btn light big" id="printSheet" type="button">
+            Print / Save as PDF
+          </button>
+          <p class="hint">
+            The saved picture is the full two-page notebook spread, wide like
+            the paper sheet.
+          </p>
         </div>
+
         <div class="stage" id="stage">
           <div class="scaler" id="scaler">
             <article class="sheet" id="marksSheet">
@@ -206,16 +219,19 @@
               <!-- Left page -->
               <section class="page left">
                 <img class="art tl" data-art="flowerTL" alt="" />
-                <div class="ribbon">
-                  <img data-art="ribbon" alt="" /><span id="sheetTitle"></span>
+                <div class="ribbon" data-f="ribbon">
+                  <img data-art="ribbon" alt="" />
+                  <span data-f="title"></span>
                 </div>
-                <div class="subtitle" id="sheetSubtitle"></div>
-                <table class="marks" id="tblA"></table>
+                <div class="subtitle" data-f="subtitle"></div>
+                <table class="marks" data-f="tblA"></table>
                 <div class="foot">
                   <img class="art fbl" data-art="flowerBL" alt="" />
-                  <div class="label avg">
-                    <img data-art="labelPinkL" alt="" />
-                    <span>Average = <b id="averageValue">0.00%</b></span>
+                  <div class="center">
+                    <div class="label avg" data-f="avgLabel">
+                      <img data-art="labelPinkL" alt="" />
+                      <span data-f="avgText"></span>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -224,15 +240,15 @@
               <section class="page right">
                 <img class="art tl" data-art="flowerTL" alt="" />
                 <img class="art tr" data-art="flowerTR" alt="" />
-                <table class="marks" id="tblB"></table>
+                <table class="marks" data-f="tblB"></table>
                 <div class="foot">
                   <img class="art fbl" data-art="flowerBL" alt="" />
                   <div class="center">
-                    <div class="label tot">
+                    <div class="label tot" data-f="totLabel">
                       <img data-art="labelYellowL" alt="" />
-                      <span>Total = <b id="grandTotal">0</b></span>
+                      <span data-f="totText"></span>
                     </div>
-                    <div class="teacher" id="teacherLine"></div>
+                    <div class="teacher" data-f="teacher"></div>
                   </div>
                   <img class="art fbr" data-art="flowerBR" alt="" />
                 </div>
@@ -240,16 +256,40 @@
             </article>
           </div>
         </div>
-      </aside>
+      </section>
     </main>
-    <!-- /layout -->
 
-    <!-- Toast notification -->
+    <!-- ── Bottom tab bar (phones) ───────────────────────────────── -->
+    <nav class="tabbar" aria-label="Steps">
+      <button type="button" data-tab-btn="details">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />
+          <circle cx="16" cy="7" r="2" />
+          <circle cx="8" cy="17" r="2" />
+        </svg>
+        <span>Details</span>
+      </button>
+      <button type="button" data-tab-btn="marks">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 6h11M9 12h11M9 18h11" />
+          <path d="M4 6h.01M4 12h.01M4 18h.01" />
+        </svg>
+        <span>Marks</span>
+        <i class="tab-badge" id="tabBadge" hidden></i>
+      </button>
+      <button type="button" data-tab-btn="sheet">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M12 4v16M6 9h3M6 13h3M15 9h3M15 13h3" />
+        </svg>
+        <span>Sheet</span>
+      </button>
+    </nav>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <!-- ── Scripts ───────────────────────────────────────────────── -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="assets/vendor/xlsx.full.min.js"></script>
+    <script src="assets/vendor/html2canvas.min.js"></script>
     <script src="js/assets.js"></script>
     <script src="js/app.js" defer></script>
   </body>

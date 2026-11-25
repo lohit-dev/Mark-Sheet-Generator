@@ -6,15 +6,17 @@ A browser-based marks sheet creator with a floral notebook-style preview. It run
 
 - Bun 1.4.4 or newer
 - Google Chrome for the responsive browser check
-- Internet access for Google Fonts, Excel import, and PNG export libraries
+- No internet needed to run the app: fonts, Excel import (SheetJS) and PNG export (html2canvas) are bundled
 
 ## Project structure
 
 ```text
 public/                 Static HTML and sheet artwork
   index.html
-  assets/svg/
-src/css/                App styles and Patrick Hand font setup
+  assets/svg/           Ribbon, label and flower artwork
+  assets/fonts/         Patrick Hand, Kalam, Pangolin digits, Inter (woff2)
+  assets/vendor/        SheetJS and html2canvas
+src/css/                App styles and self-hosted font setup
 src/js/                 App logic and asset registry
 scripts/                Bun development, build, and browser-check scripts
 dist/                   Generated static site (ignored by Git)
@@ -36,7 +38,7 @@ Open <http://127.0.0.1:5173>. Stop the server with `Ctrl+C`.
 bun run check:responsive
 ```
 
-The check builds the deployable site, opens Chrome at desktop, tablet, and phone sizes, checks Patrick Hand and content fit, then saves screenshots to `output/`. It exits with a non-zero status if a check fails. To install Chrome if needed:
+The check builds the deployable site, opens Chrome at phone, small-phone, tablet and desktop sizes, checks that sheet text is regular weight (not faux-bold), the ribbon title stays inside the ribbon, each page has 16 rows, nothing scrolls sideways, and print uses the two-page spread, then saves screenshots to `output/`. It exits with a non-zero status if a check fails. To install Chrome if needed:
 
 ```sh
 bunx playwright install chrome
@@ -74,4 +76,8 @@ git push origin main
 - Absent students are excluded from the grand total and average.
 - Average is `grand total ÷ (present students × maximum marks) × 100`.
 
-CSV import is built in. Excel `.xlsx` and `.xls` import uses SheetJS from a CDN. PNG export uses html2canvas from a CDN. Patrick Hand and the UI font load from Google Fonts; system cursive fallbacks are used offline. No local `vendor/` folder is needed. All student data stays in the browser's local storage.
+## Phone use
+
+The app is built phone-first. Three tabs at the bottom: **Details**, **Marks**, **Sheet**. Marks are typed on large student cards (tap **Ab** for absent). The sheet preview shows one page at a time on a phone; **Save picture** / **Share picture** always produce the full two-page spread, and Print uses A4 landscape.
+
+CSV import is built in, and Excel `.xlsx` / `.xls` import works offline. Everything stays in the browser's local storage and is saved when the page is hidden or closed.

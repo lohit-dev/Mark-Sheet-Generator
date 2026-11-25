@@ -7,6 +7,8 @@ const contentTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
+  ".png": "image/png",
 };
 
 function findFile(pathname) {
