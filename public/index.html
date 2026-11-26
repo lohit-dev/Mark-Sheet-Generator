@@ -11,6 +11,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231d3f94%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2711%27 font-family=%27Arial%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27white%27%3ECNR%3C/text%3E%3C/svg%3E" />
     <link rel="stylesheet" href="css/fonts.css" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/theme.css" />
   </head>
   <body data-tab="marks">
     <!-- ── Top bar ───────────────────────────────────────────────── -->
@@ -20,6 +21,17 @@
         <strong id="barTitle">Marks Sheet</strong>
         <small id="barSub">Enter marks, then make the sheet</small>
       </div>
+    </header>
+
+    <!-- ── Desktop header: flower corners and ribbon ─────────────── -->
+    <header class="hero">
+      <img class="flower tl" data-art="flowerTL" alt="" />
+      <img class="flower tr" data-art="flowerTR" alt="" />
+      <div class="hero-ribbon">
+        <img data-art="ribbon" alt="" />
+        <h1>MARKS SHEET GENERATOR</h1>
+      </div>
+      <p>Type the marks, get a notebook sheet you can share.</p>
     </header>
 
     <main class="app">
@@ -88,7 +100,7 @@
               />
             </label>
             <label id="internalField">
-              <span>Internal marks out of</span>
+              <span>Internal out of</span>
               <input
                 id="internalMax"
                 type="number"
@@ -132,6 +144,14 @@
         </div>
 
         <button class="issues" id="issues" type="button" hidden></button>
+
+        <div class="sort" id="sortBar" role="group" aria-label="Sort students" hidden>
+          <span>Sort</span>
+          <button type="button" data-sort="high">Highest first</button>
+          <button type="button" data-sort="low">Lowest first</button>
+          <button type="button" data-sort="name">A to Z</button>
+          <button type="button" class="undo" id="undoSort" hidden>Undo</button>
+        </div>
 
         <div class="students" id="students"></div>
 
@@ -192,9 +212,16 @@
       <section class="panel" id="panel-sheet" aria-label="Marks sheet">
         <div class="card sheet-actions">
           <div class="totals">
-            <div><span>Students</span><b id="totStudents">0</b></div>
-            <div><span>Grand total</span><b id="totGrand">0</b></div>
-            <div><span>Average</span><b id="totAverage">0.00%</b></div>
+            <div class="tot-chip"><span>Students</span><b id="totStudents">0</b></div>
+            <div class="tot-chip"><span>Absent</span><b id="totAbsent">0</b></div>
+            <div class="tot-label">
+              <img data-art="labelPinkL" alt="" />
+              <p>Average = <b id="totAverage">0.00%</b></p>
+            </div>
+            <div class="tot-label">
+              <img data-art="labelYellowL" alt="" />
+              <p>Grand Total = <b id="totGrand">0</b></p>
+            </div>
           </div>
           <button class="btn primary big" id="sharePng" type="button" hidden>
             Share picture

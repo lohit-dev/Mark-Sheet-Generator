@@ -28,6 +28,7 @@
   /* ═══════════════ State ═══════════════ */
   let mode = "split"; // "split" = external + internal, "total" = one column
   let students = [];
+  let beforeSort = null; // the order before the last sort, for Undo
   let printing = false;
   let sheetTimer = 0;
   let saveTimer = 0;
@@ -223,6 +224,7 @@
   function renderStudents() {
     $("students").innerHTML = students.map(cardHtml).join("");
     $("emptyState").hidden = students.length > 0;
+    $("sortBar").hidden = students.length < 2;
     students.forEach(function (s, i) {
       paintCard(i);
     });
@@ -276,6 +278,53 @@
     renderStudents();
     afterEdit();
   }
+  /* ═══════════════ Sorting ═══════════════ */
+  // students with full marks first, then unfinished ones, then absent ones
+  function sortGroup(s) {
+    const state = status(s);
+    if (state === "ok") return 0;
+    return state === "pending" ? 1 : 2;
+  }
+  function compareBy(how, a, b) {
+    if (how === "name") {
+      const x = clean(a.name);
+      const y = clean(b.name);
+      if (x === "" || y === "") return x === "" ? (y === "" ? 0 : 1) : -1;
+      return x.localeCompare(y, undefined, { sensitivity: "base" });
+    }
+    const groupGap = sortGroup(a) - sortGroup(b);
+    if (groupGap !== 0) return groupGap;
+    if (sortGroup(a) !== 0) return 0;
+    return how === "high" ? totalOf(b) - totalOf(a) : totalOf(a) - totalOf(b);
+  }
+  function sortStudents(how) {
+    if (students.length < 2) return;
+    if (!beforeSort) beforeSort = students.slice();
+    students.sort(function (a, b) {
+      return compareBy(how, a, b);
+    });
+    $("undoSort").hidden = false;
+    renderStudents();
+    afterEdit();
+    window.scrollTo(0, 0);
+    const words = { high: "highest marks first", low: "lowest marks first", name: "A to Z" };
+    toast("Sorted " + words[how] + ". Tap Undo to go back.");
+  }
+  function undoSort() {
+    if (!beforeSort) return;
+    const kept = beforeSort.filter(function (s) {
+      return students.includes(s);
+    });
+    const added = students.filter(function (s) {
+      return !beforeSort.includes(s);
+    });
+    students = kept.concat(added);
+    beforeSort = null;
+    $("undoSort").hidden = true;
+    renderStudents();
+    afterEdit();
+    toast("Back to the order you typed.");
+  }
   // Enter / "Next" on the phone keyboard moves to the next box
   function focusNext(target) {
     const boxes = Array.from($("students").querySelectorAll("input[data-f]"));
@@ -299,6 +348,10 @@
     $("sumStudents").textContent = students.length;
     $("sumAbsent").textContent = st.absent;
     $("sumAverage").textContent = average;
+    $("totStudents").textContent = students.length;
+    $("totAbsent").textContent = st.absent;
+    $("totAverage").textContent = average;
+    $("totGrand").textContent = fmt(st.grand);
     $("totStudents").textContent = students.length;
     $("totGrand").textContent = fmt(st.grand);
     $("totAverage").textContent = average;
@@ -989,9 +1042,17 @@
       const card = document.querySelector('[data-card="' + index + '"]');
       if (card) card.scrollIntoView({ block: "center" });
     });
+    document.querySelectorAll("[data-sort]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        sortStudents(button.dataset.sort);
+      });
+    });
+    $("undoSort").addEventListener("click", undoSort);
     $("clearStudents").addEventListener("click", function () {
       if (students.length && confirm("Remove all " + students.length + " students?")) {
         students = [];
+        beforeSort = null;
+        $("undoSort").hidden = true;
         renderStudents();
         afterEdit();
       }

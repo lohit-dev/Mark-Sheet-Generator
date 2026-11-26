@@ -1,0 +1,558 @@
+/* ═══════════════════════════════════════════════════════════════
+   Notebook look for the app around the sheet.
+   Loaded after styles.css: same ink blue, pink header strips, blue
+   outlines and pink offset shadows as the sheet itself. The sheet's own
+   styles (.sheet …) are not touched here.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --blue: #1c2a8c;
+  --navy: #1c2a8c;
+  --ink: #1c2a8c;
+  --muted: #4d5699;
+  --line: #2a3fa8;
+  --bg: #f6f3fc;
+  --pink: #e8559a;
+  --pink-soft: #fde5ef;
+  --pink-strip: linear-gradient(#fbc6de, #fde5ef);
+  --soft-line: #b4bbe8;
+  --appbar-h: 64px;
+}
+
+body {
+  background-color: var(--bg);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    rgba(42, 63, 168, 0.09) 31px,
+    rgba(42, 63, 168, 0.09) 32px
+  );
+  background-attachment: local;
+  font-family: "Sheet Digits", "Patrick Hand", "Kalam", cursive;
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--ink);
+}
+b,
+strong,
+th {
+  font-weight: 400;
+}
+:focus-visible {
+  outline: 3px solid var(--pink);
+}
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+.appbar {
+  background: var(--pink-strip);
+  color: var(--ink);
+  border-bottom: 2px solid var(--line);
+}
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: #fff;
+}
+.brand-mark svg {
+  width: 28px;
+  height: 28px;
+}
+.appbar-text strong {
+  font-size: 25px;
+  line-height: 1.1;
+}
+.appbar-text small {
+  font-family: "Kalam", cursive;
+  font-size: 14px;
+  opacity: 1;
+  color: var(--muted);
+}
+
+/* Desktop header with the flower corners and ribbon */
+.hero {
+  display: none;
+}
+
+/* ── Cards: a notebook page with a pink header strip ─────────── */
+.card {
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 5px 6px 0 #fbc6de;
+}
+.card h2 {
+  margin: 0;
+  padding: 10px 18px;
+  font-family: "Kalam", cursive;
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--pink-strip);
+  border-bottom: 2px solid var(--line);
+}
+.card .form-grid,
+.card .segmented {
+  padding: 18px;
+}
+.card .form-grid {
+  align-items: end;
+}
+.sheet-actions {
+  padding: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+.sheet-actions .hint,
+.sheet-actions .totals {
+  grid-column: 1 / -1;
+}
+.sheet-actions .btn.big {
+  min-height: 54px;
+  padding: 0 8px;
+}
+
+/* ── Fields ──────────────────────────────────────────────────── */
+label > span {
+  font-family: "Kalam", cursive;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+input,
+select,
+textarea {
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  font-family: "Sheet Digits", "Patrick Hand", cursive;
+  font-size: 22px;
+  color: var(--ink);
+}
+textarea {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 15px;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #6b73b3;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px #fbc6de;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' stroke='%231c2a8c' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ── Marks format choice ─────────────────────────────────────── */
+.segment {
+  border: 2px solid var(--soft-line);
+  border-radius: 12px;
+}
+.segment strong {
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.segment small {
+  font-family: "Kalam", cursive;
+  font-size: 15px;
+  color: var(--muted);
+}
+.segment::before {
+  border: 2px solid var(--line);
+}
+.segment.active {
+  border-color: var(--line);
+  background: var(--pink-soft);
+}
+.segment.active::before {
+  border-color: var(--line);
+  background: radial-gradient(var(--pink) 0 5px, #fff 6px);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  font-family: "Sheet Digits", "Patrick Hand", cursive;
+  font-size: 22px;
+  font-weight: 400;
+}
+.btn.big {
+  font-size: 23px;
+}
+.btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  box-shadow: 3px 4px 0 #fbc6de;
+}
+.btn.light {
+  background: var(--pink-soft);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn.quiet {
+  background: #fff;
+  border-color: var(--soft-line);
+  color: var(--ink);
+}
+.btn.danger {
+  background: #fff;
+  border-color: #e0788a;
+  color: #b42343;
+}
+.add-wide {
+  border-color: var(--line);
+  background: #fff;
+}
+.row-buttons .btn {
+  font-size: 18px;
+}
+.hint {
+  font-family: "Kalam", cursive;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* ── Marks step ──────────────────────────────────────────────── */
+.summary {
+  background: rgba(246, 243, 252, 0.96);
+}
+.summary > div {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 4px 6px 6px;
+}
+.summary > div:nth-child(3) {
+  background: var(--pink-soft);
+}
+.summary b {
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 400;
+  color: var(--ink);
+}
+.summary span {
+  font-family: "Kalam", cursive;
+  font-size: 13px;
+  color: var(--muted);
+}
+.sum-add {
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--ink);
+  font-family: "Patrick Hand", cursive;
+  font-size: 15px;
+  font-weight: 400;
+}
+.issues {
+  font-family: "Kalam", cursive;
+  font-size: 15px;
+}
+.sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.sort span {
+  font-family: "Kalam", cursive;
+  font-size: 16px;
+  color: var(--muted);
+  margin-right: 0;
+}
+.sort button {
+  min-height: 46px;
+  padding: 0 11px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-family: "Sheet Digits", "Patrick Hand", cursive;
+  font-size: 19px;
+  cursor: pointer;
+}
+.sort button:active {
+  background: var(--pink-soft);
+}
+.sort button.undo {
+  border-color: var(--pink);
+  background: var(--pink-soft);
+}
+.stu {
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 3px 4px 0 #fbc6de;
+}
+.stu.absent {
+  background: #fff5f9;
+  border-color: var(--pink);
+}
+.stu-no {
+  background: var(--pink-soft);
+  border: 2px solid var(--line);
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 400;
+}
+.stu-top input {
+  min-height: 46px;
+  font-size: 20px;
+}
+.stu-del {
+  color: var(--muted);
+}
+.cell > span {
+  font-family: "Kalam", cursive;
+  font-size: 13px;
+  color: var(--muted);
+}
+.cell input {
+  font-size: 25px;
+  font-weight: 400;
+}
+.cell input.bad {
+  border-color: #d8465f;
+  background: #fff1f3;
+}
+.cell input.todo {
+  border-color: #e0aa2b;
+  background: #fffbee;
+}
+.cell output {
+  background: var(--pink-soft);
+  color: var(--ink);
+  font-size: 27px;
+  font-weight: 400;
+}
+.cell button.ab {
+  border: 2px solid var(--soft-line);
+  font-family: "Sheet Digits", "Patrick Hand", cursive;
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.cell button.ab[aria-pressed="true"] {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: #fff;
+}
+.empty strong {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.empty {
+  font-family: "Kalam", cursive;
+  color: var(--muted);
+}
+.more {
+  border: 2px solid var(--line);
+  border-radius: 14px;
+}
+.more summary {
+  font-family: "Kalam", cursive;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* ── Sheet step ──────────────────────────────────────────────── */
+.stage {
+  background: #f5f3fd;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 5px 6px 0 #fbc6de;
+}
+/* totals as the sheet's own pink and yellow labels (desktop only,
+   on a phone the sheet itself shows them) */
+.totals {
+  display: none;
+}
+
+/* ── Bottom tab bar ──────────────────────────────────────────── */
+.tabbar {
+  padding: 8px 12px var(--safe-bottom);
+  gap: 8px;
+  border-top: 2px solid var(--line);
+  box-shadow: none;
+}
+.tabbar button {
+  border: 2px solid transparent;
+  border-radius: 14px;
+  color: var(--ink);
+  font-family: "Patrick Hand", cursive;
+  font-size: 18px;
+  font-weight: 400;
+}
+.tabbar button[aria-current="page"] {
+  background: var(--pink-soft);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.tabbar button[aria-current="page"]::before {
+  display: none;
+}
+.tab-badge {
+  background: var(--pink);
+}
+.toast {
+  background: var(--ink);
+  font-family: "Kalam", cursive;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Desktop
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 1000px) {
+  .appbar {
+    display: none;
+  }
+  .hero {
+    display: block;
+    position: relative;
+    height: 210px;
+    overflow: hidden;
+  }
+  .hero .flower {
+    position: absolute;
+    top: 0;
+    width: 240px;
+    max-width: 24%;
+    height: auto;
+  }
+  .hero .flower.tl {
+    left: 0;
+  }
+  .hero .flower.tr {
+    right: 0;
+  }
+  .hero-ribbon {
+    position: relative;
+    width: 560px;
+    max-width: 52%;
+    margin: 18px auto 0;
+  }
+  .hero-ribbon img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero-ribbon h1 {
+    position: absolute;
+    left: 20%;
+    width: 60%;
+    top: 15%;
+    height: 36%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .hero p {
+    margin-top: 8px;
+    text-align: center;
+    font-family: "Kalam", cursive;
+    font-size: 19px;
+    color: var(--muted);
+  }
+  .app {
+    max-width: 1360px;
+    padding: 8px 32px 64px;
+    gap: 0 32px;
+  }
+  /* the numbers move to the right, next to the sheet */
+  .summary {
+    display: none;
+  }
+  #panel-sheet {
+    top: 20px;
+  }
+  .sheet-actions {
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+    margin-bottom: 18px;
+  }
+  .sheet-actions .btn.big {
+    min-height: 56px;
+    font-size: 23px;
+  }
+  .totals {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+  .tot-chip {
+    min-width: 110px;
+    padding: 6px 18px;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 3px 4px 0 #fbc6de;
+  }
+  .tot-chip span {
+    display: block;
+    margin: 0;
+    font-family: "Kalam", cursive;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .tot-chip b {
+    display: block;
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .tot-label {
+    position: relative;
+    width: 250px;
+    height: 82px;
+  }
+  .tot-label img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .tot-label p {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: "Kalam", cursive;
+    font-size: 24px;
+    white-space: nowrap;
+  }
+  .tot-label b {
+    color: var(--red);
+    font-size: 24px;
+  }
+}
+
+@media print {
+  .hero,
+  .totals {
+    display: none !important;
+  }
+  body {
+    background-image: none;
+  }
+}

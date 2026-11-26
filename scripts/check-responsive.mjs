@@ -118,6 +118,18 @@ try {
   }));
   report(stats.count === 31 && stats.absent === "1", "import keeps absent students", stats);
 
+  await page.locator('[data-sort="high"]').click();
+  const sorted = await page.evaluate(() => {
+    const students = window.__cnr.students;
+    const present = students.filter((student) => student.external !== "Ab");
+    const totals = present.map((student) => Number(student.external) + Number(student.internal));
+    const lastIsAbsent = students.at(-1).external === "Ab";
+    const descending = totals.every((value, index) => index === 0 || totals[index - 1] >= value);
+    return { descending, lastIsAbsent };
+  });
+  report(sorted.descending && sorted.lastIsAbsent, "sort highest first, absent last", sorted);
+  await page.locator("#undoSort").click();
+
   await page.evaluate(() => window.__cnr.setTab("sheet"));
   await page.waitForTimeout(200);
 
