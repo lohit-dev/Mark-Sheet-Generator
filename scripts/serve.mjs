@@ -55,4 +55,4 @@ const server = Bun.serve({
   },
 });
 
-console.log(`CNR Marks Sheet Generator running at ${server.url}`);
+console.log(`Marks Sheet Generator running at ${server.url}`);

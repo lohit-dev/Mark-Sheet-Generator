@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   CNR Marks Sheet — mobile first.
+   Marks Sheet — mobile first.
    Base styles are for a phone (about 360px wide). The desktop layout
    starts at 1000px and shows all three steps side by side.
    ═══════════════════════════════════════════════════════════════ */
@@ -544,28 +544,6 @@ textarea:focus {
   display: grid;
   gap: 10px;
 }
-.totals {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.totals > div {
-  background: #f1f5fd;
-  border-radius: 12px;
-  padding: 8px 6px;
-  text-align: center;
-}
-.totals span {
-  display: block;
-  font-size: 12.5px;
-  color: var(--muted);
-}
-.totals b {
-  display: block;
-  font-size: 19px;
-  color: var(--navy);
-}
 .stage {
   position: relative;
   width: 100%;
@@ -985,7 +963,6 @@ body.typing .tabbar {
     gap: 10px;
     align-items: stretch;
   }
-  .sheet-actions .totals,
   .sheet-actions .hint {
     grid-column: 1 / -1;
   }

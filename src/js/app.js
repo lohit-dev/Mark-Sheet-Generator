@@ -2,7 +2,8 @@
   "use strict";
 
   /* ═══════════════ Constants ═══════════════ */
-  const STORE_KEY = "cnrMarksSheet.v1";
+  const STORE_KEY = "marksSheet.v1";
+  const OLD_STORE_KEY = "cnrMarksSheet.v1"; // read once so earlier saved sheets are not lost
   const PAGE_W = 724; // one notebook page on the design canvas
   const SPREAD_W = PAGE_W * 2; // both pages side by side
   const BASE_H = 1086; // 4:3, same proportions as the reference photos
@@ -16,10 +17,10 @@
 
   const DEFAULTS = {
     className: "VIII",
-    branch: "CNR",
+    branch: "",
     exam: "SA-1",
-    subject: "MATHS",
-    teacher: "D.V.N.S. Rama Rao",
+    subject: "",
+    teacher: "",
     maxMarks: "100",
     internalMax: "20",
   };
@@ -121,7 +122,7 @@
   }
   function subtitleText(d) {
     const branch = branchName(d.branch);
-    return "Class " + d.className + (branch ? " | " + branch + " Branch" : "");
+    return "Class " + d.className + (branch ? " | " + branch : "");
   }
 
   /* ═══════════════ Marks logic ═══════════════ */
@@ -352,11 +353,8 @@
     $("totAbsent").textContent = st.absent;
     $("totAverage").textContent = average;
     $("totGrand").textContent = fmt(st.grand);
-    $("totStudents").textContent = students.length;
-    $("totGrand").textContent = fmt(st.grand);
-    $("totAverage").textContent = average;
-    $("barTitle").textContent = titleText(d) || "Marks Sheet";
-    $("barSub").textContent = plural(students.length, "student") + " · Average " + average;
+    $("barTitle").textContent = "Marks Sheet";
+    $("barSub").textContent = titleText(d) || "Enter marks, then make the sheet";
 
     const problems = problemCount();
     const issues = $("issues");
@@ -580,7 +578,7 @@
   function load() {
     let data = null;
     try {
-      data = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      data = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_STORE_KEY) || "null");
     } catch (error) {
       data = null;
     }
@@ -1091,7 +1089,7 @@
         mode === "split"
           ? "Name,External,Internal\r\nStudent One,75,20\r\nStudent Two,Ab,Ab\r\n"
           : "Name,Marks\r\nStudent One,95\r\nStudent Two,Ab\r\n";
-      download("CNR-marks-template.csv", new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" }));
+      download("marks-template.csv", new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" }));
     });
     $("downloadPng").addEventListener("click", savePicture);
     $("sharePng").addEventListener("click", sharePicture);
@@ -1146,7 +1144,7 @@
       refreshSheet();
     });
 
-  window.__cnr = {
+  window.__sheet = {
     get students() {
       return students;
     },

@@ -1,5 +1,5 @@
 {
-  "name": "cnr-marks-sheet-generator",
+  "name": "flower-marks-sheet-generator",
   "version": "1.0.0",
   "private": true,
   "packageManager": "bun@1.4.4",

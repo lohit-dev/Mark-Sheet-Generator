@@ -100,19 +100,19 @@ try {
     waitUntil: "domcontentloaded",
   });
   await page.waitForSelector("#marksSheet", { state: "attached" });
-  await page.waitForFunction(() => window.__cnr !== undefined);
+  await page.waitForFunction(() => window.__sheet !== undefined);
 
   await page.locator("#className").selectOption("IX");
   await page.locator("#exam").selectOption("SA-1");
   await page.locator("#subject").fill("MATHS");
-  await page.evaluate(() => window.__cnr.setTab("marks"));
+  await page.evaluate(() => window.__sheet.setTab("marks"));
   await page.locator("#moreTools").evaluate((element) => (element.open = true));
   await page.locator("#csvPaste").fill(sampleCsv(30));
   await page.locator("#importPaste").click();
-  await page.waitForFunction(() => window.__cnr.students.length === 31);
+  await page.waitForFunction(() => window.__sheet.students.length === 31);
 
   const stats = await page.evaluate(() => ({
-    count: window.__cnr.students.length,
+    count: window.__sheet.students.length,
     average: document.querySelector("#sumAverage").textContent,
     absent: document.querySelector("#sumAbsent").textContent,
   }));
@@ -120,17 +120,17 @@ try {
 
   await page.locator('[data-sort="high"]').click();
   const sorted = await page.evaluate(() => {
-    const students = window.__cnr.students;
-    const present = students.filter((student) => student.external !== "Ab");
-    const totals = present.map((student) => Number(student.external) + Number(student.internal));
-    const lastIsAbsent = students.at(-1).external === "Ab";
-    const descending = totals.every((value, index) => index === 0 || totals[index - 1] >= value);
+    const totals = window.__sheet.students
+      .filter((s) => s.external !== "Ab")
+      .map((s) => Number(s.external) + Number(s.internal));
+    const lastIsAbsent = window.__sheet.students.at(-1).external === "Ab";
+    const descending = totals.every((value, i) => i === 0 || totals[i - 1] >= value);
     return { descending, lastIsAbsent };
   });
   report(sorted.descending && sorted.lastIsAbsent, "sort highest first, absent last", sorted);
   await page.locator("#undoSort").click();
 
-  await page.evaluate(() => window.__cnr.setTab("sheet"));
+  await page.evaluate(() => window.__sheet.setTab("sheet"));
   await page.waitForTimeout(200);
 
   const sizes = [
@@ -166,7 +166,7 @@ try {
   await page.locator('[data-mode="total"]').click();
   await page.locator("#className").selectOption("X");
   await page.locator("#exam").selectOption("MIDTERM");
-  await page.evaluate(() => window.__cnr.setTab("sheet"));
+  await page.evaluate(() => window.__sheet.setTab("sheet"));
   await page.waitForTimeout(250);
   const totalOnly = await measure(page);
   report(

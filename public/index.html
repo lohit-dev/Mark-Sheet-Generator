@@ -7,8 +7,8 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="theme-color" content="#1d3f94" />
-    <title>CNR Marks Sheet</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231d3f94%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2711%27 font-family=%27Arial%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27white%27%3ECNR%3C/text%3E%3C/svg%3E" />
+    <title>Marks Sheet Generator</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23f7e3ee%27/%3E%3Cg fill=%27%23e8559a%27%3E%3Ccircle cx=%2716%27 cy=%278.5%27 r=%275%27/%3E%3Ccircle cx=%2716%27 cy=%2723.5%27 r=%275%27/%3E%3Ccircle cx=%278.5%27 cy=%2716%27 r=%275%27/%3E%3Ccircle cx=%2723.5%27 cy=%2716%27 r=%275%27/%3E%3C/g%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%274.2%27 fill=%27%23f9c93c%27/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="css/fonts.css" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/theme.css" />
@@ -16,7 +16,7 @@
   <body data-tab="marks">
     <!-- ── Top bar ───────────────────────────────────────────────── -->
     <header class="appbar">
-      <span class="brand-mark">CNR</span>
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><g fill="#e8559a"><circle cx="16" cy="8.5" r="5"/><circle cx="16" cy="23.5" r="5"/><circle cx="8.5" cy="16" r="5"/><circle cx="23.5" cy="16" r="5"/></g><circle cx="16" cy="16" r="4.2" fill="#f9c93c"/></svg></span>
       <div class="appbar-text">
         <strong id="barTitle">Marks Sheet</strong>
         <small id="barSub">Enter marks, then make the sheet</small>
@@ -78,7 +78,7 @@
               </select>
             </label>
             <label>
-              <span>Branch</span>
+              <span>School / section</span>
               <input id="branch" autocomplete="off" enterkeyhint="next" />
             </label>
             <label>

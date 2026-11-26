@@ -1,6 +1,6 @@
-# CNR Marks Sheet Generator
+# Marks Sheet Generator
 
-A browser-based marks sheet creator with a floral notebook-style preview. It runs as a static site; Bun provides local development, builds, browser checks, and GitHub Pages deployment.
+A browser-based marks sheet creator that draws a hand-drawn, flower-decorated notebook spread (pink ribbon title, flower corners, ruled blue tables) from the marks you enter. It runs as a static site; Bun provides local development, builds, browser checks, and GitHub Pages deployment.
 
 ## Requirements
 

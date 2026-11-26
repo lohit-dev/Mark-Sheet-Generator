@@ -1,5 +1,5 @@
 /**
- * assets.js — Artwork registry for CNR Marks Sheet Generator
+ * assets.js — Artwork registry for Marks Sheet Generator
  *
  * Defines window.ART, mapping every data-art="…" key used in
  * index.html to an object with a resolved `src` string.
