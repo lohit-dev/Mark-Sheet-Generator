@@ -1,0 +1,353 @@
+/* ═══════════════════════════════════════════════════════════════
+   Motion: small, soft and quick. Loaded last.
+   Nothing here touches the sheet itself, so saved pictures, print and
+   PDF are never caught mid-animation. People who ask their phone for
+   less motion get none (see the end of this file).
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes flower-in-left {
+  from {
+    opacity: 0;
+    transform: translate(-26px, -26px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes flower-in-right {
+  from {
+    opacity: 0;
+    transform: translate(26px, -26px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sway {
+  from {
+    transform: rotate(-1.2deg);
+  }
+  to {
+    transform: rotate(1.2deg);
+  }
+}
+@keyframes spin-in {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Entering a step: cards rise one after another ───────────── */
+.panel > *:not(.summary) {
+  animation: rise 0.45s var(--ease-out) both;
+}
+.panel > .summary {
+  animation: fade 0.4s var(--ease-out) both;
+}
+.panel > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.panel > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.panel > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.panel > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.panel > *:nth-child(n + 6) {
+  animation-delay: 240ms;
+}
+
+/* ── Top bar and logo ────────────────────────────────────────── */
+.appbar {
+  animation: slide-down 0.5s var(--ease-out) both;
+}
+.brand-mark svg {
+  animation: spin-in 0.9s var(--ease-spring) 0.15s both;
+}
+
+/* ── Student cards ───────────────────────────────────────────── */
+.stu {
+  transition:
+    background-color 0.3s var(--ease-soft),
+    border-color 0.3s var(--ease-soft),
+    box-shadow 0.25s var(--ease-out);
+}
+#students[data-motion="list"] .stu {
+  animation: rise 0.5s var(--ease-out) both;
+  animation-delay: calc(min(var(--i, 0), 10) * 40ms);
+}
+.stu.pop {
+  animation: pop 0.45s var(--ease-spring) both;
+}
+.stu-no {
+  transition: background-color 0.3s var(--ease-soft);
+}
+.cell output {
+  transition: background-color 0.3s var(--ease-soft);
+}
+.cell input {
+  transition:
+    border-color 0.2s var(--ease-soft),
+    background-color 0.2s var(--ease-soft),
+    box-shadow 0.2s var(--ease-soft);
+}
+.cell input.bad,
+.cell input.todo {
+  animation: pop 0.3s var(--ease-out);
+}
+
+/* ── Numbers that change ─────────────────────────────────────── */
+.bump {
+  display: inline-block;
+  animation: bump 0.4s var(--ease-spring);
+}
+.summary b.bump,
+.tot-chip b.bump {
+  display: block;
+}
+
+/* ── Fields ──────────────────────────────────────────────────── */
+input,
+select,
+textarea {
+  box-shadow: 0 0 0 0 #fbc6de;
+  transition:
+    border-color 0.2s var(--ease-soft),
+    box-shadow 0.25s var(--ease-out),
+    background-color 0.2s var(--ease-soft);
+}
+
+/* ── Buttons: soft press, and a lift on screens with a mouse ─── */
+.btn,
+.sort button,
+.tabbar button,
+.segment,
+.cell button.ab,
+.stu-del,
+.sum-add {
+  transition:
+    transform 0.2s var(--ease-out),
+    background-color 0.25s var(--ease-soft),
+    border-color 0.25s var(--ease-soft),
+    color 0.25s var(--ease-soft),
+    box-shadow 0.25s var(--ease-out);
+}
+.btn:active {
+  transform: translate(2px, 3px) scale(0.99);
+}
+.btn.primary:active {
+  box-shadow: 1px 1px 0 #fbc6de;
+}
+.sort button:active,
+.tabbar button:active,
+.sum-add:active,
+.cell button.ab:active {
+  transform: scale(0.94);
+}
+.segment:active {
+  transform: scale(0.985);
+}
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn.primary:hover {
+    box-shadow: 4px 6px 0 #fbc6de;
+  }
+  .btn:active {
+    transform: translate(2px, 3px) scale(0.99);
+  }
+  .sort button:hover {
+    background: var(--pink-soft);
+  }
+  .segment:hover {
+    border-color: var(--line);
+  }
+  .stu:hover {
+    box-shadow: 4px 6px 0 #fbc6de;
+  }
+}
+
+/* ── Sort chips ──────────────────────────────────────────────── */
+.sort button.undo {
+  animation: pop 0.4s var(--ease-spring) both;
+}
+
+/* ── Marks format choice: the pink dot grows in ──────────────── */
+.segment::before {
+  background: var(--pink);
+  box-shadow: inset 0 0 0 11px #fff;
+  transition: box-shadow 0.3s var(--ease-spring);
+}
+.segment.active::before {
+  background: var(--pink);
+  box-shadow: inset 0 0 0 4px #fff;
+}
+
+/* ── Messages and extras ─────────────────────────────────────── */
+.issues:not([hidden]) {
+  animation: rise 0.35s var(--ease-out);
+}
+.more[open] .more-body {
+  animation: rise 0.35s var(--ease-out);
+}
+.empty:not([hidden]) {
+  animation: fade 0.5s var(--ease-out);
+}
+.toast {
+  transition:
+    opacity 0.3s var(--ease-soft),
+    transform 0.45s var(--ease-spring);
+}
+
+/* ── Tab bar ─────────────────────────────────────────────────── */
+.tabbar {
+  transition: transform 0.28s var(--ease-out);
+}
+.tabbar svg {
+  transition: transform 0.35s var(--ease-spring);
+}
+.tabbar button[aria-current="page"] svg {
+  transform: translateY(-2px) scale(1.14);
+}
+.tab-badge {
+  animation: pop 0.4s var(--ease-spring);
+}
+
+/* ── Desktop header and totals ───────────────────────────────── */
+@media (min-width: 1000px) {
+  .hero .flower.tl {
+    transform-origin: 0 0;
+    animation:
+      flower-in-left 0.9s var(--ease-out) both,
+      sway 7s ease-in-out 0.9s infinite alternate;
+  }
+  .hero .flower.tr {
+    transform-origin: 100% 0;
+    animation:
+      flower-in-right 0.9s var(--ease-out) 0.1s both,
+      sway 8s ease-in-out 1s infinite alternate-reverse;
+  }
+  .hero-ribbon {
+    animation: drop 0.8s var(--ease-spring) 0.15s both;
+  }
+  .hero p {
+    animation: fade 0.8s var(--ease-out) 0.45s both;
+  }
+  .totals > * {
+    animation: pop 0.5s var(--ease-spring) both;
+  }
+  .totals > *:nth-child(1) {
+    animation-delay: 120ms;
+  }
+  .totals > *:nth-child(2) {
+    animation-delay: 180ms;
+  }
+  .totals > *:nth-child(3) {
+    animation-delay: 240ms;
+  }
+  .totals > *:nth-child(4) {
+    animation-delay: 300ms;
+  }
+  .tot-label b.bump {
+    display: inline-block;
+  }
+}
+
+/* ── Less motion, and no motion for print ────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+@media print {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -86,6 +86,25 @@
       marks: "",
     };
   }
+  // small pop on a number when it changes
+  function setText(id, text) {
+    const el = $(id);
+    const next = String(text);
+    if (el.textContent === next) return;
+    el.textContent = next;
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+  }
+  // lets the student cards rise in one after another (sort, import, tab)
+  function playList() {
+    const list = $("students");
+    list.dataset.motion = "list";
+    clearTimeout(playList.timer);
+    playList.timer = setTimeout(function () {
+      delete list.dataset.motion;
+    }, 900);
+  }
   function toast(message) {
     const el = $("toast");
     el.textContent = message;
@@ -198,7 +217,7 @@
   function cardHtml(s, i) {
     const absent = status(s) === "absent";
     const split = mode === "split";
-    let h = '<div class="stu' + (absent ? " absent" : "") + '" data-card="' + i + '">';
+    let h = '<div class="stu' + (absent ? " absent" : "") + '" data-card="' + i + '" style="--i:' + i + '">';
     h += '<div class="stu-top"><span class="stu-no">' + (i + 1) + "</span>";
     h +=
       '<input data-i="' + i + '" data-f="name" autocomplete="off"' +
@@ -270,6 +289,7 @@
     afterEdit();
     const last = document.querySelector('[data-card="' + (students.length - 1) + '"]');
     if (last) {
+      last.classList.add("pop");
       last.scrollIntoView({ block: "center" });
       last.querySelector("input").focus();
     }
@@ -306,6 +326,7 @@
     });
     $("undoSort").hidden = false;
     renderStudents();
+    playList();
     afterEdit();
     window.scrollTo(0, 0);
     const words = { high: "highest marks first", low: "lowest marks first", name: "A to Z" };
@@ -323,6 +344,7 @@
     beforeSort = null;
     $("undoSort").hidden = true;
     renderStudents();
+    playList();
     afterEdit();
     toast("Back to the order you typed.");
   }
@@ -346,13 +368,13 @@
     const d = details();
     const st = stats();
     const average = st.average.toFixed(2) + "%";
-    $("sumStudents").textContent = students.length;
-    $("sumAbsent").textContent = st.absent;
-    $("sumAverage").textContent = average;
-    $("totStudents").textContent = students.length;
-    $("totAbsent").textContent = st.absent;
-    $("totAverage").textContent = average;
-    $("totGrand").textContent = fmt(st.grand);
+    setText("sumStudents", students.length);
+    setText("sumAbsent", st.absent);
+    setText("sumAverage", average);
+    setText("totStudents", students.length);
+    setText("totAbsent", st.absent);
+    setText("totAverage", average);
+    setText("totGrand", fmt(st.grand));
     $("barTitle").textContent = "Marks Sheet";
     $("barSub").textContent = titleText(d) || "Enter marks, then make the sheet";
 
@@ -617,6 +639,7 @@
       else button.removeAttribute("aria-current");
     });
     window.scrollTo(0, 0);
+    if (name === "marks") playList();
     if (name === "sheet") refreshSheet();
   }
 
@@ -764,6 +787,7 @@
     }
     students = imported;
     renderStudents();
+    playList();
     afterEdit();
     toast(plural(imported.length, "student") + " imported.");
   }
@@ -931,6 +955,7 @@
       };
     });
     renderStudents();
+    playList();
     afterEdit();
   }
 

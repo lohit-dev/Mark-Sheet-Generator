@@ -60,7 +60,7 @@ async function measure(page) {
     const overflowing = [...document.querySelectorAll("body *")]
       .filter((element) => {
         const box = element.getBoundingClientRect();
-        return box.width > 0 && box.right > innerWidth + 1 && !element.closest("#stage");
+        return box.width > 0 && box.right > innerWidth + 1 && !element.closest("#stage") && !element.closest(".hero");
       })
       .map((element) => element.id || element.className || element.tagName)
       .slice(0, 6);

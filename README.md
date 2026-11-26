@@ -16,7 +16,7 @@ public/                 Static HTML and sheet artwork
   assets/svg/           Ribbon, label and flower artwork
   assets/fonts/         Patrick Hand, Kalam, Pangolin digits, Inter (woff2)
   assets/vendor/        SheetJS and html2canvas
-src/css/                App styles (styles.css), notebook look (theme.css), self-hosted fonts
+src/css/                App styles (styles.css), notebook look (theme.css), animations (motion.css), self-hosted fonts
 src/js/                 App logic and asset registry
 scripts/                Bun development, build, and browser-check scripts
 dist/                   Generated static site (ignored by Git)
